@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/victor/decide remote:*)",
+      "Bash(pnpm --filter api add dotenv)",
+      "Bash(pnpm prisma db push:*)",
+      "Bash(docker exec:*)",
+      "Bash(pnpm prisma generate:*)",
+      "Bash(pnpm prisma migrate dev:*)",
+      "Bash(pnpm create:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm --filter web add react-router-dom)",
+      "Bash(pnpm build:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(pnpm --filter api add:*)",
+      "Bash(chmod:*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0
+  }
+}
