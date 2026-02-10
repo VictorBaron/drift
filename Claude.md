@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This project is named ShoulderTap. It's a SaaS to help companies make decisions, and see the decisions log.
+This project is named ShoulderTap.
+It's a SaaS to have better Slack notifications that fits your schedule.
+It notifies you if it's urgent; or at the end of your focus time-blockers or meetings.
 
 ## Technical details
 
@@ -70,3 +72,10 @@ The API follows NestJS modular architecture with domain-based modules.
 - **Backend:** NestJS 11, Express 5, Passport.js
 - **Database:** PostgreSQL 16, MikroORM
 - **Auth:** @nestjs/passport, passport-google-oauth20, @nestjs/jwt
+
+## Constraints
+
+- Do not use parent repositories in import paths:
+  - Use relative imports if files are colocated, absolute imports if the file is in a parent repository
+  - For absolute imports, core modules (modules inside src/core/) should be accessed through alias path @/.
+    Example: @/users/domain

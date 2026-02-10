@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
 
-import { SlackService } from './slack.service';
+import { SLACK_GATEWAY } from './domain/slack.gateway';
+import { BoltSlackGateway } from './infrastructure/gateways/bolt-slack.gateway';
 
 @Module({
-  providers: [SlackService],
-  controllers: [],
-  exports: [SlackService],
+  providers: [
+    {
+      provide: SLACK_GATEWAY,
+      useClass: BoltSlackGateway,
+    },
+  ],
+  exports: [SLACK_GATEWAY],
 })
 export class SlackModule {}
