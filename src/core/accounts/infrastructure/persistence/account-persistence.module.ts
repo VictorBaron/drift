@@ -1,12 +1,12 @@
 import { DynamicModule, Module } from '@nestjs/common';
 
-import { TypeOrmAccountPersistenceModule } from './typeorm/type-orm-account-persistence.module';
+import { MikroOrmAccountPersistenceModule } from './mikro-orm/mikro-orm-account-persistence.module';
 
 @Module({})
 export class AccountPersistenceModule {
   static use(driver: 'orm'): DynamicModule {
     const persistenceModule =
-      driver === 'orm' ? TypeOrmAccountPersistenceModule : null;
+      driver === 'orm' ? MikroOrmAccountPersistenceModule : null;
 
     if (!persistenceModule) {
       throw new Error(`Unsupported persistence driver: ${driver}`);

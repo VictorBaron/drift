@@ -1,27 +1,13 @@
+import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { DataSource, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class TransactionManagerService {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(private readonly em: EntityManager) {}
 
   async runInTransaction<T>(
-    callback: (queryRunner: QueryRunner) => Promise<T>,
+    callback: (em: EntityManager) => Promise<T>,
   ): Promise<T> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      const result = await callback(queryRunner);
-      await queryRunner.commitTransaction();
-
-      return result;
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      throw err;
-    } finally {
-      await queryRunner.release();
-    }
+    return this.em.transactional(callback);
   }
 }
