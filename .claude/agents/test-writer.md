@@ -16,6 +16,22 @@ You are a testing specialist focused on creating comprehensive, meaningful tests
 3. **One concept per test** - Each test should verify one thing
 4. **Arrange-Act-Assert** - Clear test structure
 
+## File Naming & Structure Rules
+
+- Test files MUST use `.test.ts` extension (NOT `.spec.ts`)
+- Command handler files are named without the `command` suffix: `create-account.ts` → test is `create-account.test.ts`
+- Import the command/handler from the source file (e.g., `import { CreateAccountCommand, CreateAccountHandler } from './create-account'`)
+
+## Test Writing Rules (MANDATORY)
+
+1. **Don't duplicate assertions** — Never write separate tests to check the returned value AND the repository state. One test should check the persisted state (via repository lookup). The return value check can be combined in the same test if needed.
+2. **Type `toMatchObject` calls** — Always use `toMatchObject<Partial<AggregateNameJSON>>({...})` for type safety.
+3. **Check domain events** — If the use case should emit domain events, assert them on the aggregate: `expect(account.findEvents(AccountCreatedEvent)).toHaveLength(1)`.
+4. **Create compilable stubs** — When writing tests for code that doesn't exist yet, also create minimal stub files (empty command class, empty handler class, empty types/interfaces) so the tests can at least be compiled and discovered by the test runner. The stubs should have the correct signatures but can throw `new Error('Not implemented')` in method bodies.
+5. **Use `@nestjs/testing` Test module** — Always wire up dependencies via `Test.createTestingModule()` for consistency with NestJS DI.
+6. **Test the behavior, not the implementation** Never test if a method has been called; through `toHaveBeenCalledTimes` for example.
+7. **Never mock** Directly call external functions; only mock when calling external APIs
+
 ## Test Generation Process
 
 ### 1. Analyze the Code
@@ -139,10 +155,11 @@ describe("Feature Integration", () => {
 
 - Use descriptive test names in describe (`when something specific happens`)
 - Avoid test interdependence
-- Mock external dependencies
+- Mock only external dependencies
 - Use factories for test data
 - Keep tests fast (< 100ms for unit tests)
 - Don't test methods, test the whole use case behavior
 - Use InMemory repositories for unit tests.
 - Always test the actually saved data in the repository
 - Check events in the aggregate, if any should have been sent
+- Call directly other services, do not mock functions 
