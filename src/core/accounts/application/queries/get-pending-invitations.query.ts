@@ -7,7 +7,7 @@ export class GetPendingInvitationsQuery {
 }
 
 @Injectable()
-export class GetPendingInvitationsHandler {
+export class GetPendingInvitations {
   constructor(private readonly memberRepository: MemberRepository) {}
 
   async execute(query: GetPendingInvitationsQuery): Promise<Member[]> {

@@ -8,9 +8,7 @@ import { SlackInstallationRepository } from '@/slack/domain/slack-installation.r
 import { SlackInstallationRepositoryInMemory } from './in-memory/slack-installation.repository.in-memory';
 import { SlackInstallationStore } from './slack-installation.store';
 
-function buildInstallation(
-  overrides: Record<string, unknown> = {},
-): Installation<'v1' | 'v2', boolean> {
+function buildInstallation(overrides: Record<string, unknown> = {}): Installation<'v1' | 'v2', boolean> {
   return {
     team: { id: 'T123', name: 'Test Team' },
     enterprise: undefined,
@@ -49,9 +47,7 @@ describe('SlackInstallation Store', () => {
       ],
     }).compile();
 
-    repository = module.get<SlackInstallationRepositoryInMemory>(
-      SlackInstallationRepository,
-    );
+    repository = module.get<SlackInstallationRepositoryInMemory>(SlackInstallationRepository);
     store = module.get<SlackInstallationStore>(SlackInstallationStore);
 
     repository.clear();

@@ -1,12 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
-import {
-  type Member,
-  MemberRepository,
-  MemberRole,
-  type MemberRoleLevel,
-} from '@/accounts/domain';
+import { BaseCommand } from 'src/common/application/command-handler';
+import { type Member, MemberRepository, MemberRole, type MemberRoleLevel } from '@/accounts/domain';
 
 export class ChangeMemberRoleCommand {
   constructor(
@@ -20,7 +15,7 @@ export class ChangeMemberRoleCommand {
 }
 
 @CommandHandler(ChangeMemberRoleCommand)
-export class ChangeMemberRoleHandler extends BaseCommandHandler<ChangeMemberRoleCommand> {
+export class ChangeMemberRole extends BaseCommand<ChangeMemberRoleCommand> {
   constructor(private readonly memberRepository: MemberRepository) {
     super();
   }

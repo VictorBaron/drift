@@ -8,7 +8,7 @@ export interface ChannelProps extends AggregateRootProps {
   purpose: string;
   isPrivate: boolean;
   isArchived: boolean;
-  memberCount: number;
+  memberIds: string[];
 }
 
 export interface CreateChannelProps {
@@ -19,7 +19,7 @@ export interface CreateChannelProps {
   purpose: string;
   isPrivate: boolean;
   isArchived: boolean;
-  memberCount: number;
+  memberIds: string[];
 }
 
 export interface UpdateChannelProps {
@@ -28,7 +28,7 @@ export interface UpdateChannelProps {
   purpose: string;
   isPrivate: boolean;
   isArchived: boolean;
-  memberCount: number;
+  memberIds: string[];
 }
 
 export interface ChannelJSON extends AggregateRootJSON {
@@ -39,5 +39,5 @@ export interface ChannelJSON extends AggregateRootJSON {
   purpose: string;
   isPrivate: boolean;
   isArchived: boolean;
-  memberCount: number;
+  memberIds: string[];
 }

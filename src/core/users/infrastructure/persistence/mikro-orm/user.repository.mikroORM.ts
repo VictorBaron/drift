@@ -9,10 +9,7 @@ import { UserMapper } from './mappers';
 import { UserMikroOrm } from './models';
 
 @Injectable()
-export class UserRepositoryMikroOrm
-  extends RepositoryMikroORM<User, UserMikroOrm>
-  implements UserRepository
-{
+export class UserRepositoryMikroOrm extends RepositoryMikroORM<User, UserMikroOrm> implements UserRepository {
   constructor(em: EntityManager, eventBus: EventBus) {
     super(em, eventBus, UserMapper, UserMikroOrm);
   }
@@ -46,11 +43,7 @@ export class UserRepositoryMikroOrm
   }
 
   async findAll(): Promise<User[]> {
-    const entities = await this.em.find(
-      UserMikroOrm,
-      {},
-      { orderBy: { name: 'ASC' } },
-    );
+    const entities = await this.em.find(UserMikroOrm, {}, { orderBy: { name: 'ASC' } });
     return entities.map((e) => UserMapper.toDomain(e));
   }
 }

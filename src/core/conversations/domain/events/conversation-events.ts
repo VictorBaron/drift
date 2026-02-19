@@ -5,10 +5,7 @@ export class ConversationImportedEvent extends DomainEvent {
   readonly conversationId: string;
   readonly accountId: string;
 
-  constructor({
-    conversationId,
-    accountId,
-  }: { conversationId: string; accountId: string }) {
+  constructor({ conversationId, accountId }: { conversationId: string; accountId: string }) {
     super();
     this.conversationId = conversationId;
     this.accountId = accountId;

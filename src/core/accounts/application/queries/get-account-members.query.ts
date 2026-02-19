@@ -12,13 +12,11 @@ export class GetAccountMembersQuery {
 }
 
 @Injectable()
-export class GetAccountMembersHandler {
+export class GetAccountMembers {
   constructor(private readonly memberRepository: MemberRepository) {}
 
   async execute(query: GetAccountMembersQuery): Promise<Member[]> {
-    const members = await this.memberRepository.findByAccountId(
-      query.props.accountId,
-    );
+    const members = await this.memberRepository.findByAccountId(query.props.accountId);
 
     return members;
   }

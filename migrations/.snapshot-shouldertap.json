@@ -1,5 +1,7 @@
 {
-  "namespaces": ["public"],
+  "namespaces": [
+    "public"
+  ],
   "name": "public",
   "tables": [
     {
@@ -68,7 +70,9 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["slack_team_id"],
+          "columnNames": [
+            "slack_team_id"
+          ],
           "composite": false,
           "keyName": "account_slack_team_id_unique",
           "constraint": true,
@@ -77,7 +81,9 @@
         },
         {
           "keyName": "account_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -197,16 +203,6 @@
           "nullable": false,
           "default": "false",
           "mappedType": "boolean"
-        },
-        "member_count": {
-          "name": "member_count",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "0",
-          "mappedType": "integer"
         }
       },
       "name": "channel",
@@ -214,7 +210,10 @@
       "indexes": [
         {
           "keyName": "channel_account_id_slack_channel_id_unique",
-          "columnNames": ["account_id", "slack_channel_id"],
+          "columnNames": [
+            "account_id",
+            "slack_channel_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -222,7 +221,9 @@
         },
         {
           "keyName": "channel_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -233,9 +234,13 @@
       "foreignKeys": {
         "channel_account_id_foreign": {
           "constraintName": "channel_account_id_foreign",
-          "columnNames": ["account_id"],
+          "columnNames": [
+            "account_id"
+          ],
           "localTableName": "public.channel",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.account",
           "updateRule": "cascade"
         }
@@ -318,7 +323,10 @@
       "indexes": [
         {
           "keyName": "conversation_account_id_slack_conversation_id_unique",
-          "columnNames": ["account_id", "slack_conversation_id"],
+          "columnNames": [
+            "account_id",
+            "slack_conversation_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -326,7 +334,9 @@
         },
         {
           "keyName": "conversation_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -337,9 +347,13 @@
       "foreignKeys": {
         "conversation_account_id_foreign": {
           "constraintName": "conversation_account_id_foreign",
-          "columnNames": ["account_id"],
+          "columnNames": [
+            "account_id"
+          ],
           "localTableName": "public.conversation",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.account",
           "updateRule": "cascade"
         }
@@ -519,7 +533,9 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["team_id"],
+          "columnNames": [
+            "team_id"
+          ],
           "composite": false,
           "keyName": "slack_installation_team_id_index",
           "constraint": false,
@@ -527,7 +543,9 @@
           "unique": false
         },
         {
-          "columnNames": ["enterprise_id"],
+          "columnNames": [
+            "enterprise_id"
+          ],
           "composite": false,
           "keyName": "slack_installation_enterprise_id_index",
           "constraint": false,
@@ -535,7 +553,9 @@
           "unique": false
         },
         {
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "composite": false,
           "keyName": "slack_installation_user_id_index",
           "constraint": false,
@@ -544,7 +564,10 @@
         },
         {
           "keyName": "slack_installation_team_id_enterprise_id_unique",
-          "columnNames": ["team_id", "enterprise_id"],
+          "columnNames": [
+            "team_id",
+            "enterprise_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -552,7 +575,9 @@
         },
         {
           "keyName": "slack_installation_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -659,7 +684,9 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["email"],
+          "columnNames": [
+            "email"
+          ],
           "composite": false,
           "keyName": "user_email_unique",
           "constraint": true,
@@ -667,7 +694,9 @@
           "unique": true
         },
         {
-          "columnNames": ["google_id"],
+          "columnNames": [
+            "google_id"
+          ],
           "composite": false,
           "keyName": "user_google_id_index",
           "constraint": false,
@@ -675,7 +704,9 @@
           "unique": false
         },
         {
-          "columnNames": ["google_id"],
+          "columnNames": [
+            "google_id"
+          ],
           "composite": false,
           "keyName": "user_google_id_unique",
           "constraint": true,
@@ -683,7 +714,9 @@
           "unique": true
         },
         {
-          "columnNames": ["slack_id"],
+          "columnNames": [
+            "slack_id"
+          ],
           "composite": false,
           "keyName": "user_slack_id_index",
           "constraint": false,
@@ -691,7 +724,9 @@
           "unique": false
         },
         {
-          "columnNames": ["slack_id"],
+          "columnNames": [
+            "slack_id"
+          ],
           "composite": false,
           "keyName": "user_slack_id_unique",
           "constraint": true,
@@ -700,7 +735,9 @@
         },
         {
           "keyName": "user_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -844,7 +881,9 @@
       "indexes": [
         {
           "keyName": "idx_member_userId",
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "composite": false,
           "constraint": false,
           "primary": false,
@@ -852,7 +891,9 @@
         },
         {
           "keyName": "idx_member_accountId",
-          "columnNames": ["account_id"],
+          "columnNames": [
+            "account_id"
+          ],
           "composite": false,
           "constraint": false,
           "primary": false,
@@ -860,7 +901,10 @@
         },
         {
           "keyName": "member_account_id_user_id_unique",
-          "columnNames": ["account_id", "user_id"],
+          "columnNames": [
+            "account_id",
+            "user_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -868,7 +912,9 @@
         },
         {
           "keyName": "member_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -879,17 +925,25 @@
       "foreignKeys": {
         "member_account_id_foreign": {
           "constraintName": "member_account_id_foreign",
-          "columnNames": ["account_id"],
+          "columnNames": [
+            "account_id"
+          ],
           "localTableName": "public.member",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.account",
           "updateRule": "cascade"
         },
         "member_user_id_foreign": {
           "constraintName": "member_user_id_foreign",
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "localTableName": "public.member",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "updateRule": "cascade"
         }
@@ -1027,7 +1081,9 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["slack_ts"],
+          "columnNames": [
+            "slack_ts"
+          ],
           "composite": false,
           "keyName": "message_slack_ts_index",
           "constraint": false,
@@ -1036,7 +1092,9 @@
         },
         {
           "keyName": "message_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -1047,17 +1105,25 @@
       "foreignKeys": {
         "message_account_id_foreign": {
           "constraintName": "message_account_id_foreign",
-          "columnNames": ["account_id"],
+          "columnNames": [
+            "account_id"
+          ],
           "localTableName": "public.message",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.account",
           "updateRule": "cascade"
         },
         "message_sender_id_foreign": {
           "constraintName": "message_sender_id_foreign",
-          "columnNames": ["sender_id"],
+          "columnNames": [
+            "sender_id"
+          ],
           "localTableName": "public.message",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.member",
           "updateRule": "cascade"
         }
@@ -1090,7 +1156,10 @@
       "indexes": [
         {
           "keyName": "conversation_members_pkey",
-          "columnNames": ["conversation_mikro_orm_id", "member_mikro_orm_id"],
+          "columnNames": [
+            "conversation_mikro_orm_id",
+            "member_mikro_orm_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": true,
@@ -1101,18 +1170,93 @@
       "foreignKeys": {
         "conversation_members_conversation_mikro_orm_id_foreign": {
           "constraintName": "conversation_members_conversation_mikro_orm_id_foreign",
-          "columnNames": ["conversation_mikro_orm_id"],
+          "columnNames": [
+            "conversation_mikro_orm_id"
+          ],
           "localTableName": "public.conversation_members",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.conversation",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "conversation_members_member_mikro_orm_id_foreign": {
           "constraintName": "conversation_members_member_mikro_orm_id_foreign",
-          "columnNames": ["member_mikro_orm_id"],
+          "columnNames": [
+            "member_mikro_orm_id"
+          ],
           "localTableName": "public.conversation_members",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.member",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "channel_mikro_orm_id": {
+          "name": "channel_mikro_orm_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "member_mikro_orm_id": {
+          "name": "member_mikro_orm_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        }
+      },
+      "name": "channel_members",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "channel_members_pkey",
+          "columnNames": [
+            "channel_mikro_orm_id",
+            "member_mikro_orm_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "channel_members_channel_mikro_orm_id_foreign": {
+          "constraintName": "channel_members_channel_mikro_orm_id_foreign",
+          "columnNames": [
+            "channel_mikro_orm_id"
+          ],
+          "localTableName": "public.channel_members",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.channel",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "channel_members_member_mikro_orm_id_foreign": {
+          "constraintName": "channel_members_member_mikro_orm_id_foreign",
+          "columnNames": [
+            "member_mikro_orm_id"
+          ],
+          "localTableName": "public.channel_members",
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.member",
           "deleteRule": "cascade",
           "updateRule": "cascade"

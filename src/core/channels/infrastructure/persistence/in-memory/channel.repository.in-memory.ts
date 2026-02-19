@@ -2,10 +2,7 @@ import { RepositoryInMemory } from 'common/domain/repository.in-memory';
 
 import type { Channel, ChannelRepository } from '@/channels/domain';
 
-export class ChannelRepositoryInMemory
-  extends RepositoryInMemory<Channel>
-  implements ChannelRepository
-{
+export class ChannelRepositoryInMemory extends RepositoryInMemory<Channel> implements ChannelRepository {
   async findByAccountId(accountId: string): Promise<Channel[]> {
     return this.filter((channel) => channel.toJSON().accountId === accountId);
   }
@@ -20,9 +17,7 @@ export class ChannelRepositoryInMemory
     return (
       this.find((channel) => {
         const json = channel.toJSON();
-        return (
-          json.accountId === accountId && json.slackChannelId === slackChannelId
-        );
+        return json.accountId === accountId && json.slackChannelId === slackChannelId;
       }) ?? null
     );
   }

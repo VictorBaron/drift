@@ -1,5 +1,5 @@
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { User, UserRepository } from '@/users/domain';
 
 export class CreateUserCommand {
@@ -12,7 +12,7 @@ export class CreateUserCommand {
 }
 
 @CommandHandler(CreateUserCommand)
-export class CreateUserHandler extends BaseCommandHandler<CreateUserCommand> {
+export class CreateUser extends BaseCommand<CreateUserCommand> {
   constructor(private readonly repository: UserRepository) {
     super();
   }

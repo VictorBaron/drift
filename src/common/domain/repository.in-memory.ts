@@ -1,12 +1,8 @@
 import type { AggregateRoot } from './aggregate-root';
 import type { SoftDeletableEntityProps } from './entity';
 
-export class RepositoryInMemory<
-  Aggregate extends AggregateRoot<SoftDeletableEntityProps>,
-> {
-  constructor(
-    protected readonly aggregates: Map<string, Aggregate> = new Map(),
-  ) {}
+export class RepositoryInMemory<Aggregate extends AggregateRoot<SoftDeletableEntityProps>> {
+  constructor(protected readonly aggregates: Map<string, Aggregate> = new Map()) {}
 
   get(id: string): Aggregate | undefined {
     return this.aggregates.get(id);
@@ -16,14 +12,10 @@ export class RepositoryInMemory<
     return Array.from(this.aggregates.values());
   }
 
-  find(
-    predicate: (v: Aggregate, i: number, obj: Aggregate[]) => boolean,
-  ): Promise<Aggregate | null> {
+  find(predicate: (v: Aggregate, i: number, obj: Aggregate[]) => boolean): Promise<Aggregate | null> {
     return Promise.resolve(this.toArray().find(predicate) ?? null);
   }
-  filter(
-    predicate: (v: Aggregate, i: number, obj: Aggregate[]) => boolean,
-  ): Promise<Aggregate[]> {
+  filter(predicate: (v: Aggregate, i: number, obj: Aggregate[]) => boolean): Promise<Aggregate[]> {
     return Promise.resolve(this.toArray().filter(predicate));
   }
 
@@ -33,9 +25,7 @@ export class RepositoryInMemory<
 
   async findByIds(ids: string[]): Promise<Aggregate[]> {
     return Promise.resolve(
-      ids
-        .map((id) => this.get(id))
-        .filter((aggregate): aggregate is Aggregate => aggregate !== undefined),
+      ids.map((id) => this.get(id)).filter((aggregate): aggregate is Aggregate => aggregate !== undefined),
     );
   }
 

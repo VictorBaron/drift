@@ -1,7 +1,4 @@
-import type {
-  SlackUserInfo,
-  SlackUsersGateway,
-} from '@/accounts/domain/gateways/slack-users.gateway';
+import type { SlackUserInfo, SlackUsersGateway } from '@/accounts/domain/gateways/slack-users.gateway';
 
 export class FakeSlackUsersGateway implements SlackUsersGateway {
   private users: SlackUserInfo[];

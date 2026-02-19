@@ -1,34 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { CookieAuthGuard } from 'auth/cookie-auth.guard';
 import type { Request } from 'express';
 
-import {
-  CreateAccountCommand,
-  UpdateAccountCommand,
-} from './application/commands';
-import {
-  GetAccountByIdHandler,
-  GetAccountByIdQuery,
-  GetUserAccountsHandler,
-  GetUserAccountsQuery,
-} from './application/queries';
+import { CreateAccountCommand, UpdateAccountCommand } from './application/commands';
+import { GetAccountById, GetAccountByIdQuery, GetUserAccounts, GetUserAccountsQuery } from './application/queries';
 import { Account, Member, MemberRepository } from './domain';
-import type {
-  AccountResponseDTO,
-  CreateAccountDto,
-  UpdateAccountDto,
-} from './dto';
+import type { AccountResponseDTO, CreateAccountDto, UpdateAccountDto } from './dto';
 
 interface AuthRequest extends Request {
   user: { sub: string; email: string; name?: string };
@@ -39,26 +17,18 @@ interface AuthRequest extends Request {
 export class AccountsController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly getAccountByIdHandler: GetAccountByIdHandler,
-    private readonly getUserAccountsHandler: GetUserAccountsHandler,
+    private readonly getAccountById: GetAccountById,
+    private readonly getUserAccounts: GetUserAccounts,
     private readonly memberRepository: MemberRepository,
   ) {}
 
-  private async getActor({
-    accountId,
-    userId,
-  }: {
-    accountId: string;
-    userId: string;
-  }): Promise<Member> {
+  private async getActor({ accountId, userId }: { accountId: string; userId: string }): Promise<Member> {
     const actor = await this.memberRepository.findByAccountIdAndUserId({
       accountId,
       userId,
     });
     if (!actor || actor.isDisabled()) {
-      throw new NotFoundException(
-        'Cannot found member for this user and account',
-      );
+      throw new NotFoundException('Cannot found member for this user and account');
     }
 
     return actor;
@@ -89,7 +59,7 @@ export class AccountsController {
   @Get()
   async findAll(@Req() req: AuthRequest) {
     const query = new GetUserAccountsQuery(req.user.sub);
-    const accounts = await this.getUserAccountsHandler.execute(query);
+    const accounts = await this.getUserAccounts.execute(query);
     return accounts.map((account) => this.mapToResponse(account));
   }
 
@@ -99,16 +69,12 @@ export class AccountsController {
       accountId: id,
       actorUserId: req.user.sub,
     });
-    const account = await this.getAccountByIdHandler.execute(query);
+    const account = await this.getAccountById.execute(query);
     return this.mapToResponse(account);
   }
 
   @Patch(':id')
-  async update(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-    @Body() dto: UpdateAccountDto,
-  ) {
+  async update(@Req() req: AuthRequest, @Param('id') id: string, @Body() dto: UpdateAccountDto) {
     const actor = await this.getActor({ accountId: id, userId: req.user.sub });
 
     const command = new UpdateAccountCommand({

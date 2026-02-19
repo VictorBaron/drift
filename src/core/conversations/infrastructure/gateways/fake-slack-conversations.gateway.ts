@@ -3,14 +3,10 @@ import type {
   SlackConversationsGateway,
 } from '@/conversations/domain/gateways/slack-conversations.gateway';
 
-export class FakeSlackConversationsGateway
-  implements SlackConversationsGateway
-{
+export class FakeSlackConversationsGateway implements SlackConversationsGateway {
   private conversations: SlackConversationInfo[] = [];
 
-  async listUserConversations(
-    _userToken: string,
-  ): Promise<SlackConversationInfo[]> {
+  async listUserConversations(_userToken: string): Promise<SlackConversationInfo[]> {
     return this.conversations;
   }
 

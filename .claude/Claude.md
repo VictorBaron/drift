@@ -191,15 +191,24 @@ src/<module>/
 
 ```typescript
 // Example: testing a command handler with InMemory repository
-describe('SendMessageCommand', () => {
-  let handler: SendMessageCommandHandler;
+describe('Send message', () => {
+  let handler: SendMessage;
   let messageRepository: InMemoryMessageRepository;
-  let slackGateway: jest.Mocked<SlackGateway>;
+  let slackGateway: FakeSlackGateway;
 
   beforeEach(() => {
-    messageRepository = new InMemoryMessageRepository();
-    slackGateway = createMockSlackGateway();
-    handler = new SendMessageCommandHandler(messageRepository, slackGateway);
+    const module = await Test.createTestingModule({
+      providers: [
+        MyCommandHandler,
+        { provide: MessageRepository, useClass: InMemoryMessageRepository },
+        { provide: SLACK_GATEWAY, useClass: FakeSlackGateway },
+      ],
+    }).compile();
+
+    handler = module.get<MyCommandHandler>(MyCommandHandler);
+    messageRepository = module.get<InMemoryMessageRepository>(MessageRepository);
+    slackGateway = module.get<FakeSlackGateway>(SLACK_GATEWAY);
+    messageRepository.clear();
   });
 
   it('should mark message as urgent when score is 5', async () => {
@@ -207,10 +216,8 @@ describe('SendMessageCommand', () => {
     const result = await handler.execute(command);
 
     const message = await messageRepository.findById(result.messageId);
-    expect(message.isUrgent()).toBe(true);
-    expect(message.getEvents()).toContainEqual(
-      expect.objectContaining({ type: 'MessageMarkedUrgent' }),
-    );
+    expect(message?.isUrgent()).toBe(true);
+    expect(message?.findEvents(MemberInvitedEvent)).toHaveLength(1);
   });
 });
 ```

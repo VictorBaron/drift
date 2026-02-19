@@ -11,22 +11,17 @@ import { WebApiSlackConversationsGateway } from '@/conversations/infrastructure/
 import { UserPersistenceModule } from '@/users/infrastructure';
 import { AccountsController } from './accounts.controller';
 import {
-  AcceptInvitationHandler,
-  ChangeMemberRoleHandler,
-  CreateAccountHandler,
-  DeleteAccountHandler,
-  DisableMemberHandler,
-  EnableMemberHandler,
-  InviteMemberHandler,
-  UpdateAccountHandler,
+  AcceptInvitation,
+  ChangeMemberRole,
+  CreateAccount,
+  DeleteAccount,
+  DisableMember,
+  EnableMember,
+  InviteMember,
+  UpdateAccount,
 } from './application/commands';
-import { ProvisionAccountFromSlackHandler } from './application/commands/provision-account-from-slack';
-import {
-  GetAccountByIdHandler,
-  GetAccountMembersHandler,
-  GetPendingInvitationsHandler,
-  GetUserAccountsHandler,
-} from './application/queries';
+import { ProvisionAccountFromSlack } from './application/commands/provision-account-from-slack';
+import { GetAccountById, GetAccountMembers, GetPendingInvitations, GetUserAccounts } from './application/queries';
 import {
   SlackChannelsImportService,
   SlackConversationsImportService,
@@ -48,15 +43,15 @@ import { InvitationsController, MembersController } from './members.controller';
   ],
   controllers: [AccountsController, MembersController, InvitationsController],
   providers: [
-    CreateAccountHandler,
-    UpdateAccountHandler,
-    DeleteAccountHandler,
-    InviteMemberHandler,
-    AcceptInvitationHandler,
-    DisableMemberHandler,
-    EnableMemberHandler,
-    ChangeMemberRoleHandler,
-    ProvisionAccountFromSlackHandler,
+    CreateAccount,
+    UpdateAccount,
+    DeleteAccount,
+    InviteMember,
+    AcceptInvitation,
+    DisableMember,
+    EnableMember,
+    ChangeMemberRole,
+    ProvisionAccountFromSlack,
     SlackUsersImportService,
     SlackChannelsImportService,
     SlackConversationsImportService,
@@ -66,10 +61,10 @@ import { InvitationsController, MembersController } from './members.controller';
       provide: SLACK_CONVERSATIONS_GATEWAY,
       useClass: WebApiSlackConversationsGateway,
     },
-    GetAccountByIdHandler,
-    GetUserAccountsHandler,
-    GetAccountMembersHandler,
-    GetPendingInvitationsHandler,
+    GetAccountById,
+    GetUserAccounts,
+    GetAccountMembers,
+    GetPendingInvitations,
   ],
   exports: [],
 })

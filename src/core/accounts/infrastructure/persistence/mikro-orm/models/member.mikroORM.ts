@@ -1,16 +1,9 @@
-import {
-  Collection,
-  Entity,
-  Index,
-  ManyToMany,
-  ManyToOne,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Collection, Entity, Index, ManyToMany, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
 
 import type { MemberRoleLevel } from '@/accounts/domain';
+import { ChannelMikroOrm } from '@/channels/infrastructure/persistence/mikro-orm';
 import { ConversationMikroOrm } from '@/conversations/infrastructure/persistence/mikro-orm';
 import { UserMikroOrm } from '@/users/infrastructure/persistence/mikro-orm';
 import { AccountMikroOrm } from './account.mikroORM';
@@ -53,9 +46,13 @@ export class MemberMikroOrm extends PersistenceEntity {
   )
   conversations = new Collection<ConversationMikroOrm>(this);
 
-  static build(
-    props: OwnPersistenceEntityProperties<MemberMikroOrm>,
-  ): MemberMikroOrm {
+  @ManyToMany(
+    () => ChannelMikroOrm,
+    (channel) => channel.members,
+  )
+  channels = new Collection<ChannelMikroOrm>(this);
+
+  static build(props: OwnPersistenceEntityProperties<MemberMikroOrm>): MemberMikroOrm {
     return Object.assign(new MemberMikroOrm(), props);
   }
 }

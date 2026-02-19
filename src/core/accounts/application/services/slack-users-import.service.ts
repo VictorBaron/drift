@@ -33,34 +33,24 @@ export class SlackUsersImportService extends BaseService {
 
     this.logger.log(eligibleUsers);
 
-    const installerSlackUser = eligibleUsers.find(
-      (slackUser) => slackUser.slackId === installerSlackUserId,
-    );
+    const installerSlackUser = eligibleUsers.find((slackUser) => slackUser.slackId === installerSlackUserId);
 
     if (!installerSlackUser) return;
 
-    const installer = await this.findOrCreateFounder(
-      installerSlackUser,
-      account,
-    );
+    const installer = await this.findOrCreateFounder(installerSlackUser, account);
 
     for (const slackUser of eligibleUsers) {
       await this.findOrInviteMember(slackUser, installer);
     }
   }
 
-  private async findOrCreateFounder(
-    installerSlackUser: SlackUserInfo,
-    account: Account,
-  ) {
+  private async findOrCreateFounder(installerSlackUser: SlackUserInfo, account: Account) {
     const installerUser = await this.findOrCreateUser(installerSlackUser);
 
-    const existingMember = await this.memberRepository.findByAccountIdAndUserId(
-      {
-        accountId: account.getId(),
-        userId: installerUser.getId(),
-      },
-    );
+    const existingMember = await this.memberRepository.findByAccountIdAndUserId({
+      accountId: account.getId(),
+      userId: installerUser.getId(),
+    });
 
     if (existingMember) return existingMember;
     const installer = Member.createFounder({
@@ -75,12 +65,10 @@ export class SlackUsersImportService extends BaseService {
   private async findOrInviteMember(slackUser: SlackUserInfo, inviter: Member) {
     const user = await this.findOrCreateUser(slackUser);
 
-    const existingMember = await this.memberRepository.findByAccountIdAndUserId(
-      {
-        accountId: inviter.getAccountId(),
-        userId: user.getId(),
-      },
-    );
+    const existingMember = await this.memberRepository.findByAccountIdAndUserId({
+      accountId: inviter.getAccountId(),
+      userId: user.getId(),
+    });
     if (existingMember) return existingMember;
 
     const newMember = Member.invite({
@@ -91,11 +79,7 @@ export class SlackUsersImportService extends BaseService {
     return newMember;
   }
 
-  private async findOrCreateUser(slackUser: {
-    slackId: string;
-    email: string | null;
-    name: string;
-  }): Promise<User> {
+  private async findOrCreateUser(slackUser: { slackId: string; email: string | null; name: string }): Promise<User> {
     const existing = await this.userRepository.findBySlackId(slackUser.slackId);
     if (existing) return existing;
 

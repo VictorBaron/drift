@@ -2,20 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import { PassportStrategy } from '@nestjs/passport';
-import {
-  type Profile,
-  Strategy,
-  type VerifyCallback,
-} from 'passport-google-oauth20';
+import { type Profile, Strategy, type VerifyCallback } from 'passport-google-oauth20';
 
+import { CreateOAuthUserCommand, LinkGoogleAccountCommand } from '@/users/application/commands';
 import {
-  CreateOAuthUserCommand,
-  LinkGoogleAccountCommand,
-} from '@/users/application/commands';
-import {
-  GetUserByEmailHandler,
+  GetUserByEmail,
   GetUserByEmailQuery,
-  GetUserByGoogleIdHandler,
+  GetUserByGoogleId,
   GetUserByGoogleIdQuery,
 } from '@/users/application/queries';
 
@@ -24,8 +17,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     readonly config: ConfigService,
     private readonly commandBus: CommandBus,
-    private readonly getUserByGoogleIdHandler: GetUserByGoogleIdHandler,
-    private readonly getUserByEmailHandler: GetUserByEmailHandler,
+    private readonly getUserByGoogleId: GetUserByGoogleId,
+    private readonly getUserByEmail: GetUserByEmail,
   ) {
     super({
       clientID: config.get<string>('GOOGLE_CLIENT_ID')!,
@@ -68,14 +61,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     displayName: string;
     email: string;
   }) {
-    const userByGoogleId = await this.getUserByGoogleIdHandler.execute(
-      new GetUserByGoogleIdQuery(googleId),
-    );
+    const userByGoogleId = await this.getUserByGoogleId.execute(new GetUserByGoogleIdQuery(googleId));
     if (userByGoogleId) return userByGoogleId;
 
-    const userByEmail = await this.getUserByEmailHandler.execute(
-      new GetUserByEmailQuery(email),
-    );
+    const userByEmail = await this.getUserByEmail.execute(new GetUserByEmailQuery(email));
 
     if (userByEmail) {
       return this.commandBus.execute(

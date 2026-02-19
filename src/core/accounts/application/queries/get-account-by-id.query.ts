@@ -1,14 +1,6 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import {
-  Account,
-  AccountRepository,
-  MemberRepository,
-} from '@/accounts/domain';
+import { Account, AccountRepository, MemberRepository } from '@/accounts/domain';
 
 export class GetAccountByIdQuery {
   constructor(
@@ -20,7 +12,7 @@ export class GetAccountByIdQuery {
 }
 
 @Injectable()
-export class GetAccountByIdHandler {
+export class GetAccountById {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly memberRepository: MemberRepository,
@@ -36,9 +28,7 @@ export class GetAccountByIdHandler {
       throw new ForbiddenException('You do not have access to this account');
     }
 
-    const account = await this.accountRepository.findById(
-      query.props.accountId,
-    );
+    const account = await this.accountRepository.findById(query.props.accountId);
 
     if (!account) {
       throw new NotFoundException('Account not found');

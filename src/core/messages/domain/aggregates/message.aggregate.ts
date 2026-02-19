@@ -1,14 +1,7 @@
 import { GenericMessageEvent } from '@slack/types';
 import { AggregateRoot } from 'common/domain';
-import {
-  MessageCreatedEvent,
-  MessageScoredEvent,
-} from '@/messages/domain/events';
-import type {
-  CreateMessageProps,
-  MessageJSON,
-  MessageProps,
-} from './message.types';
+import { MessageCreatedEvent, MessageScoredEvent } from '@/messages/domain/events';
+import type { CreateMessageProps, MessageJSON, MessageProps } from './message.types';
 
 export class Message extends AggregateRoot {
   private accountId: string;
@@ -67,13 +60,7 @@ export class Message extends AggregateRoot {
     return new Message(props);
   }
 
-  setUrgencyScore({
-    score,
-    reasoning,
-  }: {
-    score: number;
-    reasoning: string;
-  }): void {
+  setUrgencyScore({ score, reasoning }: { score: number; reasoning: string }): void {
     this.urgencyScore = score;
     this.urgencyReasoning = reasoning;
     this.addDomainEvent(

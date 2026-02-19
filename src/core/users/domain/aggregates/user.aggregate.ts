@@ -1,19 +1,8 @@
 import { AggregateRoot } from 'common/domain';
 
-import {
-  Email,
-  GoogleAccountLinkedEvent,
-  UserCreatedEvent,
-  UserUpdatedEvent,
-} from '@/users/domain';
+import { Email, GoogleAccountLinkedEvent, UserCreatedEvent, UserUpdatedEvent } from '@/users/domain';
 
-import type {
-  CreateOAuthUserProps,
-  CreateSlackUserProps,
-  CreateUserProps,
-  UserJSON,
-  UserProps,
-} from './types';
+import type { CreateOAuthUserProps, CreateSlackUserProps, CreateUserProps, UserJSON, UserProps } from './types';
 
 export class User extends AggregateRoot {
   private email: Email;

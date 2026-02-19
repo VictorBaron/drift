@@ -1,17 +1,7 @@
-import {
-  Collection,
-  Entity,
-  ManyToMany,
-  ManyToOne,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Collection, Entity, ManyToMany, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
-import {
-  AccountMikroOrm,
-  MemberMikroOrm,
-} from '@/accounts/infrastructure/persistence/mikro-orm';
+import { AccountMikroOrm, MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
 
 @Entity({ tableName: 'conversation' })
 @Unique({ properties: ['account', 'slackConversationId'] })

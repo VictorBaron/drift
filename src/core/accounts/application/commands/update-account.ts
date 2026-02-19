@@ -1,6 +1,6 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { Account, AccountRepository, Member } from '@/accounts/domain';
 
 export class UpdateAccountCommand {
@@ -14,7 +14,7 @@ export class UpdateAccountCommand {
 }
 
 @CommandHandler(UpdateAccountCommand)
-export class UpdateAccountHandler extends BaseCommandHandler<UpdateAccountCommand> {
+export class UpdateAccount extends BaseCommand<UpdateAccountCommand> {
   constructor(private readonly accountRepository: AccountRepository) {
     super();
   }
@@ -28,9 +28,7 @@ export class UpdateAccountHandler extends BaseCommandHandler<UpdateAccountComman
     }
 
     if (!actor.isAdmin() || !actor.isActive()) {
-      throw new ForbiddenException(
-        'Only active admins can update account details',
-      );
+      throw new ForbiddenException('Only active admins can update account details');
     }
 
     account.updateName(name);

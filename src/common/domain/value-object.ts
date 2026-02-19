@@ -12,8 +12,7 @@ export abstract class ValueObject<T extends object> {
     if (valueObject === null || valueObject === undefined) return false;
 
     return Object.entries(this.props).every(
-      ([key, value]) =>
-        key in valueObject.props && valueObject.props[key as keyof T] === value,
+      ([key, value]) => key in valueObject.props && valueObject.props[key as keyof T] === value,
     );
   }
 }

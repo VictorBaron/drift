@@ -47,9 +47,7 @@ export class SlackInstallationMikroOrm extends PersistenceEntity {
   @Property({ type: 'timestamptz' })
   installedAt: Date;
 
-  static build(
-    props: OwnPersistenceEntityProperties<SlackInstallationMikroOrm>,
-  ): SlackInstallationMikroOrm {
+  static build(props: OwnPersistenceEntityProperties<SlackInstallationMikroOrm>): SlackInstallationMikroOrm {
     return Object.assign(new SlackInstallationMikroOrm(), props);
   }
 }

@@ -11,9 +11,7 @@ export class AccountMikroOrm extends PersistenceEntity {
   @Unique()
   slackTeamId: string;
 
-  static build(
-    props: OwnPersistenceEntityProperties<AccountMikroOrm>,
-  ): AccountMikroOrm {
+  static build(props: OwnPersistenceEntityProperties<AccountMikroOrm>): AccountMikroOrm {
     return Object.assign(new AccountMikroOrm(), props);
   }
 }

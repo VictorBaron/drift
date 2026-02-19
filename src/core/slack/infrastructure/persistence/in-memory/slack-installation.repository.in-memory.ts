@@ -10,10 +10,7 @@ export class SlackInstallationRepositoryInMemory
   extends RepositoryInMemory<SlackInstallation>
   implements SlackInstallationRepository
 {
-  findByTeamAndEnterprise({
-    teamId,
-    enterpriseId,
-  }: SlackInstallationLookup): Promise<SlackInstallation | null> {
+  findByTeamAndEnterprise({ teamId, enterpriseId }: SlackInstallationLookup): Promise<SlackInstallation | null> {
     if (!teamId && !enterpriseId) {
       return Promise.resolve(null);
     }
@@ -25,25 +22,17 @@ export class SlackInstallationRepositoryInMemory
     }
     return (
       this.find(
-        (installation) =>
-          installation.getTeamId() === teamId &&
-          installation.getEnterpriseId() === enterpriseId,
+        (installation) => installation.getTeamId() === teamId && installation.getEnterpriseId() === enterpriseId,
       ) ?? null
     );
   }
 
   findByTeamId(teamId: string): Promise<SlackInstallation | null> {
-    return (
-      this.find((installation) => installation.getTeamId() === teamId) ?? null
-    );
+    return this.find((installation) => installation.getTeamId() === teamId) ?? null;
   }
 
   findByEnterpriseId(enterpriseId: string): Promise<SlackInstallation | null> {
-    return (
-      this.find(
-        (installation) => installation.getEnterpriseId() === enterpriseId,
-      ) ?? null
-    );
+    return this.find((installation) => installation.getEnterpriseId() === enterpriseId) ?? null;
   }
 
   delete(slackInstallation: SlackInstallation): Promise<void> {

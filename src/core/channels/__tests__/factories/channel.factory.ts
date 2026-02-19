@@ -11,7 +11,7 @@ export class ChannelFactory {
       purpose: 'Company-wide announcements',
       isPrivate: false,
       isArchived: false,
-      memberCount: 10,
+      memberIds: ['memberId'],
       createdAt: new Date('2025-01-01'),
       updatedAt: new Date('2025-01-01'),
       deletedAt: null,

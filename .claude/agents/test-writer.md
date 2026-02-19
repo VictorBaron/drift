@@ -20,7 +20,7 @@ You are a testing specialist focused on creating comprehensive, meaningful tests
 
 - Test files MUST use `.test.ts` extension (NOT `.spec.ts`)
 - Command handler files are named without the `command` suffix: `create-account.ts` → test is `create-account.test.ts`
-- Import the command/handler from the source file (e.g., `import { CreateAccountCommand, CreateAccountHandler } from './create-account'`)
+- Import the command/handler from the source file (e.g., `import { CreateAccountCommand, CreateAccount } from './create-account'`)
 
 ## Test Writing Rules (MANDATORY)
 

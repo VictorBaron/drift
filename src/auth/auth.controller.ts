@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
 
@@ -38,10 +30,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const { token, user } = await this.auth.login(dto.email, dto.password);
     res.cookie('session', token, this.cookieOptions());
     return user;
@@ -56,9 +45,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(CookieAuthGuard)
   me(@Req() req: Request) {
-    const payload = (
-      req as Request & { user: { sub: string; email: string; name?: string } }
-    ).user;
+    const payload = (req as Request & { user: { sub: string; email: string; name?: string } }).user;
     return { id: payload.sub, email: payload.email, name: payload.name };
   }
 
@@ -76,8 +63,7 @@ export class AuthController {
 
     res.cookie('session', token, this.cookieOptions());
 
-    const frontendUrl =
-      this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:5173';
+    const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:5173';
     res.redirect(frontendUrl);
   }
 }

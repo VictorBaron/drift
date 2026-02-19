@@ -7,7 +7,7 @@ export class GetUserByIdQuery {
 }
 
 @Injectable()
-export class GetUserByIdHandler {
+export class GetUserById {
   constructor(private readonly repository: UserRepository) {}
 
   async execute(query: GetUserByIdQuery): Promise<User> {

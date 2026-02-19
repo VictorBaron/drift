@@ -31,13 +31,7 @@
   "settings": {
     "event_subscriptions": {
       "request_url": "https://localhost:3000/slack/events",
-      "user_events": [
-        "message.channels",
-        "message.groups",
-        "message.im",
-        "message.mpim",
-        "reaction_added"
-      ]
+      "user_events": ["message.channels", "message.groups", "message.im", "message.mpim", "reaction_added"]
     },
     "interactivity": {
       "is_enabled": true,

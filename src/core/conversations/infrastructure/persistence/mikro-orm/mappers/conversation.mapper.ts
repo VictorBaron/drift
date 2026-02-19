@@ -6,8 +6,7 @@ import { ConversationMikroOrm } from '@/conversations/infrastructure/persistence
 
 export class ConversationMapper {
   static toDomain(raw: ConversationMikroOrm): Conversation {
-    if (!raw.account)
-      throw new Error('Error reconstructing Conversation: missing account');
+    if (!raw.account) throw new Error('Error reconstructing Conversation: missing account');
     return Conversation.reconstitute({
       id: raw.id,
       accountId: raw.account.id,

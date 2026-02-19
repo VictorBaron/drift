@@ -1,10 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { ParseJsonOutputService } from '@/ai/parse-json-output.service';
-import type {
-  UrgencyScoringGateway,
-  UrgencyScoringResult,
-} from '@/scoring/domain/gateways';
+import type { UrgencyScoringGateway, UrgencyScoringInput, UrgencyScoringResult } from '@/scoring/domain/gateways';
 
 const enum AnthropicModel {
   HAIKU = 'claude-haiku-4-5',
@@ -21,7 +18,7 @@ export class AnthropicUrgencyScoringGateway implements UrgencyScoringGateway {
     this.client = new Anthropic();
   }
 
-  async scoreMessage(input: { text: string }): Promise<UrgencyScoringResult> {
+  async scoreMessage(input: UrgencyScoringInput): Promise<UrgencyScoringResult> {
     const response = await this.client.messages.create({
       model: AnthropicModel.HAIKU,
       max_tokens: 256,
@@ -38,9 +35,7 @@ export class AnthropicUrgencyScoringGateway implements UrgencyScoringGateway {
       throw new Error('No text response from Anthropic');
     }
 
-    const messageAnalysis = this.parseJsonOutputService.parse(
-      textBlock.text,
-    ) as UrgencyScoringResult;
+    const messageAnalysis = this.parseJsonOutputService.parse(textBlock.text) as UrgencyScoringResult;
     this.logger.log(messageAnalysis);
 
     return messageAnalysis;

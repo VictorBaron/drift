@@ -6,10 +6,7 @@ import { MikroOrmUserPersistenceModule } from './mikro-orm/mikro-orm-user-persis
 @Module({})
 export class UserPersistenceModule {
   static use(driver: 'orm' | 'in-memory'): DynamicModule {
-    const persistenceModule =
-      driver === 'orm'
-        ? MikroOrmUserPersistenceModule
-        : InMemoryUserPersistenceModule;
+    const persistenceModule = driver === 'orm' ? MikroOrmUserPersistenceModule : InMemoryUserPersistenceModule;
 
     return {
       module: UserPersistenceModule,

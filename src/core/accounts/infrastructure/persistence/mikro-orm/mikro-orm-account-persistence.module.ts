@@ -9,10 +9,7 @@ import { MemberRepositoryMikroOrm } from './member.repository.mikroORM';
 import { AccountMikroOrm, MemberMikroOrm } from './models';
 
 @Module({
-  imports: [
-    MikroOrmModule.forFeature([AccountMikroOrm, MemberMikroOrm]),
-    PersistenceModule,
-  ],
+  imports: [MikroOrmModule.forFeature([AccountMikroOrm, MemberMikroOrm]), PersistenceModule],
   providers: [
     {
       provide: AccountRepository,

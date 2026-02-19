@@ -23,11 +23,7 @@ export class ChannelRepositoryMikroOrm
   }
 
   async findByAccountId(accountId: string): Promise<Channel[]> {
-    const entities = await this.em.find(
-      ChannelMikroOrm,
-      { account: accountId },
-      { orderBy: { name: 'ASC' } },
-    );
+    const entities = await this.em.find(ChannelMikroOrm, { account: accountId }, { orderBy: { name: 'ASC' } });
     return this.mapArrayToDomain(entities);
   }
 

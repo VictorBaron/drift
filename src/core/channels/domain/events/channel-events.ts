@@ -5,10 +5,7 @@ export class ChannelImportedEvent extends DomainEvent {
   readonly channelId: string;
   readonly accountId: string;
 
-  constructor({
-    channelId,
-    accountId,
-  }: { channelId: string; accountId: string }) {
+  constructor({ channelId, accountId }: { channelId: string; accountId: string }) {
     super();
     this.channelId = channelId;
     this.accountId = accountId;

@@ -6,10 +6,8 @@ import { MessageMikroOrm } from '@/messages/infrastructure/persistence/mikro-orm
 
 export class MessageMapper {
   static toDomain(raw: MessageMikroOrm): Message {
-    if (!raw.account)
-      throw new Error('Error reconstructing message: missing account');
-    if (!raw.sender)
-      throw new Error('Error reconstructing message: missing sender');
+    if (!raw.account) throw new Error('Error reconstructing message: missing account');
+    if (!raw.sender) throw new Error('Error reconstructing message: missing sender');
     return Message.reconstitute({
       id: raw.id,
       accountId: raw.account?.id,

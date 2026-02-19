@@ -20,10 +20,7 @@ export interface SoftDeletableEntityJSON extends EntityJSON {
   deletedAt: Date | null;
 }
 
-export abstract class Entity<T extends EntityProps> extends DomainModel<
-  T,
-  'id'
-> {
+export abstract class Entity<T extends EntityProps> extends DomainModel<T, 'id'> {
   constructor(props: T) {
     super({ id: props.id });
 
@@ -56,9 +53,7 @@ export abstract class Entity<T extends EntityProps> extends DomainModel<
   }
 }
 
-export class SoftDeletableEntity<
-  T extends SoftDeletableEntityProps,
-> extends Entity<T> {
+export class SoftDeletableEntity<T extends SoftDeletableEntityProps> extends Entity<T> {
   constructor(props: T) {
     super(props);
     this.deletedAt = props.deletedAt;

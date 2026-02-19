@@ -127,12 +127,7 @@ export class SlackInstallation extends AggregateRoot {
     });
   }
 
-  update(
-    props: Omit<
-      SlackInstallationProps,
-      'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'installedAt'
-    >,
-  ): void {
+  update(props: Omit<SlackInstallationProps, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'installedAt'>): void {
     this.teamId = props.teamId;
     this.enterpriseId = props.enterpriseId;
     this.userId = props.userId;

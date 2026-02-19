@@ -24,9 +24,7 @@ export class UserMikroOrm extends PersistenceEntity {
   @Index()
   slackId: string | null;
 
-  static build(
-    props: OwnPersistenceEntityProperties<UserMikroOrm>,
-  ): UserMikroOrm {
+  static build(props: OwnPersistenceEntityProperties<UserMikroOrm>): UserMikroOrm {
     return Object.assign(new UserMikroOrm(), props);
   }
 }

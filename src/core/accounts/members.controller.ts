@@ -21,18 +21,13 @@ import {
   InviteMemberCommand,
 } from './application/commands';
 import {
-  GetAccountMembersHandler,
+  GetAccountMembers,
   GetAccountMembersQuery,
-  GetPendingInvitationsHandler,
+  GetPendingInvitations,
   GetPendingInvitationsQuery,
 } from './application/queries';
 import { AccountRepository, Member, MemberRepository } from './domain';
-import type {
-  ChangeMemberRoleDto,
-  InvitationResponseDTO,
-  InviteMemberDto,
-  MemberResponseDTO,
-} from './dto';
+import type { ChangeMemberRoleDto, InvitationResponseDTO, InviteMemberDto, MemberResponseDTO } from './dto';
 
 interface AuthRequest extends Request {
   user: { sub: string; email: string; name?: string };
@@ -43,7 +38,7 @@ interface AuthRequest extends Request {
 export class MembersController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly getAccountMembersHandler: GetAccountMembersHandler,
+    private readonly getAccountMembers: GetAccountMembers,
     private readonly memberRepository: MemberRepository,
   ) {}
 
@@ -78,25 +73,17 @@ export class MembersController {
       userId,
     });
     if (!actor || actor.isDisabled()) {
-      throw new NotFoundException(
-        'Cannot found member for this user and account',
-      );
+      throw new NotFoundException('Cannot found member for this user and account');
     }
     if (!allowInactive && actor.isPending()) {
-      throw new NotFoundException(
-        'Cannot found member for this user and account',
-      );
+      throw new NotFoundException('Cannot found member for this user and account');
     }
 
     return actor;
   }
 
   @Post()
-  async invite(
-    @Req() req: AuthRequest,
-    @Param('accountId') accountId: string,
-    @Body() dto: InviteMemberDto,
-  ) {
+  async invite(@Req() req: AuthRequest, @Param('accountId') accountId: string, @Body() dto: InviteMemberDto) {
     const actor = await this.getActor({ accountId, userId: req.user.sub });
 
     const command = new InviteMemberCommand({
@@ -109,33 +96,25 @@ export class MembersController {
   }
 
   @Get()
-  async findAll(
-    @Req() req: AuthRequest,
-    @Param('accountId') accountId: string,
-  ) {
+  async findAll(@Req() req: AuthRequest, @Param('accountId') accountId: string) {
     const actor = await this.getActor({ accountId, userId: req.user.sub });
 
     const query = new GetAccountMembersQuery({
       accountId,
       actor,
     });
-    const members = await this.getAccountMembersHandler.execute(query);
+    const members = await this.getAccountMembers.execute(query);
     return members.map((member) => this.mapToResponse(member));
   }
 
   @Post(':id/accept')
-  async accept(
-    @Req() req: AuthRequest,
-    @Param('accountId') accountId: string,
-    @Param('id') id: string,
-  ) {
+  async accept(@Req() req: AuthRequest, @Param('accountId') accountId: string, @Param('id') id: string) {
     const actor = await this.getActor({
       accountId,
       userId: req.user.sub,
       allowInactive: true,
     });
-    if (actor.id !== id)
-      throw new ForbiddenException('Cannot accept ivitation for this member');
+    if (actor.id !== id) throw new ForbiddenException('Cannot accept ivitation for this member');
 
     const command = new AcceptInvitationCommand({
       accountId,
@@ -167,11 +146,7 @@ export class MembersController {
   }
 
   @Post(':id/disable')
-  async disable(
-    @Req() req: AuthRequest,
-    @Param('accountId') accountId: string,
-    @Param('id') id: string,
-  ) {
+  async disable(@Req() req: AuthRequest, @Param('accountId') accountId: string, @Param('id') id: string) {
     const actor = await this.getActor({ accountId, userId: req.user.sub });
 
     const command = new DisableMemberCommand({
@@ -185,11 +160,7 @@ export class MembersController {
   }
 
   @Post(':id/enable')
-  async enable(
-    @Req() req: AuthRequest,
-    @Param('accountId') accountId: string,
-    @Param('id') id: string,
-  ) {
+  async enable(@Req() req: AuthRequest, @Param('accountId') accountId: string, @Param('id') id: string) {
     const actor = await this.getActor({ accountId, userId: req.user.sub });
 
     const command = new EnableMemberCommand({
@@ -207,20 +178,18 @@ export class MembersController {
 @UseGuards(CookieAuthGuard)
 export class InvitationsController {
   constructor(
-    private readonly getPendingInvitationsHandler: GetPendingInvitationsHandler,
+    private readonly getPendingInvitations: GetPendingInvitations,
     private readonly accountRepository: AccountRepository,
   ) {}
 
   @Get()
   async findPending(@Req() req: AuthRequest): Promise<InvitationResponseDTO[]> {
     const query = new GetPendingInvitationsQuery(req.user.sub);
-    const members = await this.getPendingInvitationsHandler.execute(query);
+    const members = await this.getPendingInvitations.execute(query);
 
     const invitations: InvitationResponseDTO[] = [];
     for (const member of members) {
-      const account = await this.accountRepository.findById(
-        member.getAccountId(),
-      );
+      const account = await this.accountRepository.findById(member.getAccountId());
       if (account) {
         const invitedMember = member.toJSON();
         invitations.push({

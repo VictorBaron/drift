@@ -1,6 +1,6 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { AccountRepository, Member } from '@/accounts/domain';
 
 export class DeleteAccountCommand {
@@ -13,7 +13,7 @@ export class DeleteAccountCommand {
 }
 
 @CommandHandler(DeleteAccountCommand)
-export class DeleteAccountHandler extends BaseCommandHandler<DeleteAccountCommand> {
+export class DeleteAccount extends BaseCommand<DeleteAccountCommand> {
   constructor(private readonly accountRepository: AccountRepository) {
     super();
   }

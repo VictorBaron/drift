@@ -5,9 +5,7 @@ import { Injectable } from '@nestjs/common';
 export class TransactionManagerService {
   constructor(private readonly em: EntityManager) {}
 
-  async runInTransaction<T>(
-    callback: (em: EntityManager) => Promise<T>,
-  ): Promise<T> {
+  async runInTransaction<T>(callback: (em: EntityManager) => Promise<T>): Promise<T> {
     return this.em.transactional(callback);
   }
 }

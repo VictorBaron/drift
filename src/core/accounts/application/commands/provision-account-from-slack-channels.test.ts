@@ -1,29 +1,19 @@
 import { Test } from '@nestjs/testing';
-
+import { SlackChannelsImportService, SlackConversationsImportService, SlackUsersImportService } from '@/accounts';
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
-import {
-  SLACK_USERS_GATEWAY,
-  type SlackUserInfo,
-} from '@/accounts/domain/gateways/slack-users.gateway';
+import { SLACK_USERS_GATEWAY, type SlackUserInfo } from '@/accounts/domain/gateways/slack-users.gateway';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
 import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { ChannelFactory } from '@/channels/__tests__/factories/channel.factory';
 import { ChannelRepository } from '@/channels/domain';
-import {
-  SLACK_CHANNELS_GATEWAY,
-  type SlackChannelInfo,
-} from '@/channels/domain/gateways/slack-channels.gateway';
+import { SLACK_CHANNELS_GATEWAY, type SlackChannelInfo } from '@/channels/domain/gateways/slack-channels.gateway';
 import { FakeSlackChannelsGateway } from '@/channels/infrastructure/gateways/fake-slack-channels.gateway';
 import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence/in-memory/channel.repository.in-memory';
 import { UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
-
-import {
-  ProvisionAccountFromSlackCommand,
-  ProvisionAccountFromSlackHandler,
-} from './provision-account-from-slack';
+import { ProvisionAccountFromSlack, ProvisionAccountFromSlackCommand } from './provision-account-from-slack';
 
 const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
   slackId: 'U_INSTALLER',
@@ -34,9 +24,7 @@ const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
   ...overrides,
 });
 
-const makeSlackChannel = (
-  overrides?: Partial<SlackChannelInfo>,
-): SlackChannelInfo => ({
+const makeSlackChannel = (overrides?: Partial<SlackChannelInfo>): SlackChannelInfo => ({
   slackChannelId: 'C_GENERAL',
   name: 'general',
   topic: 'General discussion',
@@ -44,11 +32,12 @@ const makeSlackChannel = (
   isPrivate: false,
   isArchived: false,
   memberCount: 10,
+  memberSlackIds: [],
   ...overrides,
 });
 
 describe('Provision Account From Slack — Channel Import', () => {
-  let handler: ProvisionAccountFromSlackHandler;
+  let handler: ProvisionAccountFromSlack;
   let accountRepository: AccountRepositoryInMemory;
   let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
@@ -59,7 +48,10 @@ describe('Provision Account From Slack — Channel Import', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        ProvisionAccountFromSlackHandler,
+        ProvisionAccountFromSlack,
+        SlackUsersImportService,
+        SlackChannelsImportService,
+        SlackConversationsImportService,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
@@ -72,17 +64,13 @@ describe('Provision Account From Slack — Channel Import', () => {
       ],
     }).compile();
 
-    handler = module.get(ProvisionAccountFromSlackHandler);
-    accountRepository =
-      module.get<AccountRepositoryInMemory>(AccountRepository);
+    handler = module.get(ProvisionAccountFromSlack);
+    accountRepository = module.get<AccountRepositoryInMemory>(AccountRepository);
     memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
     slackUsersGateway = module.get<FakeSlackUsersGateway>(SLACK_USERS_GATEWAY);
-    channelRepository =
-      module.get<ChannelRepositoryInMemory>(ChannelRepository);
-    slackChannelsGateway = module.get<FakeSlackChannelsGateway>(
-      SLACK_CHANNELS_GATEWAY,
-    );
+    channelRepository = module.get<ChannelRepositoryInMemory>(ChannelRepository);
+    slackChannelsGateway = module.get<FakeSlackChannelsGateway>(SLACK_CHANNELS_GATEWAY);
 
     slackUsersGateway.setUsers([makeSlackUser()]);
     slackChannelsGateway.setChannels([]);
@@ -110,15 +98,10 @@ describe('Provision Account From Slack — Channel Import', () => {
       await handler.execute(command);
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const channels = await channelRepository.findByAccountId(
-        account!.getId(),
-      );
+      const channels = await channelRepository.findByAccountId(account!.getId());
 
       expect(channels).toHaveLength(2);
-      expect(channels.map((c) => c.toJSON().name).sort()).toEqual([
-        'general',
-        'random',
-      ]);
+      expect(channels.map((c) => c.toJSON().name).sort()).toEqual(['general', 'random']);
     });
 
     it('should store the correct channel properties', async () => {
@@ -144,9 +127,7 @@ describe('Provision Account From Slack — Channel Import', () => {
       await handler.execute(command);
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const channels = await channelRepository.findByAccountId(
-        account!.getId(),
-      );
+      const channels = await channelRepository.findByAccountId(account!.getId());
 
       expect(channels[0].toJSON()).toMatchObject({
         accountId: account!.getId(),
@@ -179,9 +160,7 @@ describe('Provision Account From Slack — Channel Import', () => {
       await handler.execute(command);
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const channels = await channelRepository.findByAccountId(
-        account!.getId(),
-      );
+      const channels = await channelRepository.findByAccountId(account!.getId());
 
       expect(channels).toHaveLength(1);
       expect(channels[0].toJSON().isArchived).toBe(true);
@@ -206,9 +185,7 @@ describe('Provision Account From Slack — Channel Import', () => {
       await handler.execute(command);
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const channels = await channelRepository.findByAccountId(
-        account!.getId(),
-      );
+      const channels = await channelRepository.findByAccountId(account!.getId());
 
       expect(channels).toHaveLength(1);
       expect(channels[0].toJSON().isPrivate).toBe(true);
@@ -230,7 +207,6 @@ describe('Provision Account From Slack — Channel Import', () => {
         name: 'general',
         topic: 'Old topic',
         purpose: 'Old purpose',
-        memberCount: 5,
         isArchived: false,
       });
       await channelRepository.save(existingChannel);
@@ -283,7 +259,6 @@ describe('Provision Account From Slack — Channel Import', () => {
         name: 'general',
         topic: '',
         purpose: '',
-        memberCount: 5,
         isArchived: false,
       });
       await channelRepository.save(existingChannel);
@@ -326,7 +301,6 @@ describe('Provision Account From Slack — Channel Import', () => {
         name: 'general',
         topic: '',
         purpose: '',
-        memberCount: 10,
         isArchived: false,
       });
       await channelRepository.save(existingChannel);
@@ -351,9 +325,7 @@ describe('Provision Account From Slack — Channel Import', () => {
 
       await handler.execute(command);
 
-      const channels = await channelRepository.findByAccountId(
-        existingAccount.getId(),
-      );
+      const channels = await channelRepository.findByAccountId(existingAccount.getId());
       expect(channels).toHaveLength(2);
 
       const newChannel = await channelRepository.findBySlackChannelId({

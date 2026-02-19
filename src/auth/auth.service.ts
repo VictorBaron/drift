@@ -4,32 +4,25 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
 import { CreateUserCommand } from '@/users/application/commands';
-import {
-  GetUserByEmailHandler,
-  GetUserByEmailQuery,
-} from '@/users/application/queries';
+import { GetUserByEmail, GetUserByEmailQuery } from '@/users/application/queries';
 import type { User, UserJSON } from '@/users/domain';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly getUserByEmailHandler: GetUserByEmailHandler,
+    private readonly getUserByEmail: GetUserByEmail,
     private readonly jwt: JwtService,
   ) {}
 
   async register(email: string, password: string) {
     const hash = await argon2.hash(password);
-    const user = await this.commandBus.execute(
-      new CreateUserCommand({ email, password: hash }),
-    );
+    const user = await this.commandBus.execute(new CreateUserCommand({ email, password: hash }));
     return { id: user.getId(), email: user.getEmail() };
   }
 
   async login(email: string, password: string) {
-    const user = await this.getUserByEmailHandler.execute(
-      new GetUserByEmailQuery(email),
-    );
+    const user = await this.getUserByEmail.execute(new GetUserByEmailQuery(email));
     if (!user || !user.getPassword()) {
       throw new UnauthorizedException('Invalid credentials');
     }

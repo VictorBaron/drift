@@ -70,9 +70,7 @@ export class RepositoryMikroORM<
   }
 
   async saveMany(aggregates: Aggregate[]): Promise<Aggregate[]> {
-    const entities = aggregates.map((aggregate) =>
-      this.mapper.toPersistence(aggregate),
-    );
+    const entities = aggregates.map((aggregate) => this.mapper.toPersistence(aggregate));
     await this.em.upsertMany(this.entityName, entities);
     await this.em.flush();
 

@@ -1,11 +1,12 @@
 import { randomInt } from 'crypto';
-import type {
-  UrgencyScoringGateway,
-  UrgencyScoringResult,
-} from '@/scoring/domain/gateways';
+import type { UrgencyScoringGateway, UrgencyScoringInput, UrgencyScoringResult } from '@/scoring/domain/gateways';
 
 export class FakeUrgencyScoringGateway implements UrgencyScoringGateway {
-  async scoreMessage(): Promise<UrgencyScoringResult> {
+  private lastInput: UrgencyScoringInput | null = null;
+
+  async scoreMessage(input: UrgencyScoringInput): Promise<UrgencyScoringResult> {
+    this.lastInput = input;
+
     const fakeScores: UrgencyScoringResult[] = [
       {
         score: 1,
@@ -35,5 +36,10 @@ export class FakeUrgencyScoringGateway implements UrgencyScoringGateway {
     ];
     const randomScore = fakeScores[randomInt(5)];
     return randomScore;
+  }
+
+  getLastInput(): UrgencyScoringInput {
+    if (!this.lastInput) throw new Error('scoreMessage has not been called');
+    return this.lastInput;
   }
 }

@@ -2,10 +2,7 @@ import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core';
 import { GenericMessageEvent } from '@slack/types';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
-import {
-  AccountMikroOrm,
-  MemberMikroOrm,
-} from '@/accounts/infrastructure/persistence/mikro-orm';
+import { AccountMikroOrm, MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
 
 @Entity({ tableName: 'message' })
 export class MessageMikroOrm extends PersistenceEntity {
@@ -37,9 +34,7 @@ export class MessageMikroOrm extends PersistenceEntity {
   @Property({ type: 'text', nullable: true })
   urgencyReasoning: string | null;
 
-  static build(
-    props: OwnPersistenceEntityProperties<MessageMikroOrm>,
-  ): MessageMikroOrm {
+  static build(props: OwnPersistenceEntityProperties<MessageMikroOrm>): MessageMikroOrm {
     return Object.assign(new MessageMikroOrm(), props);
   }
 }

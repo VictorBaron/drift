@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { Member, MemberRepository } from '@/accounts/domain';
 
 export class AcceptInvitationCommand {
@@ -13,7 +13,7 @@ export class AcceptInvitationCommand {
 }
 
 @CommandHandler(AcceptInvitationCommand)
-export class AcceptInvitationHandler extends BaseCommandHandler<AcceptInvitationCommand> {
+export class AcceptInvitation extends BaseCommand<AcceptInvitationCommand> {
   constructor(private readonly memberRepository: MemberRepository) {
     super();
   }

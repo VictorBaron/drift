@@ -327,7 +327,7 @@ export class CreateOrderCommand {
 }
 
 @Injectable()
-export class CreateOrderHandler {
+export class CreateOrder {
   constructor(
     @Inject(ORDER_REPOSITORY) private readonly orderRepo: OrderRepository
   ) {}
@@ -381,13 +381,13 @@ export class PricingService {
 import { Module } from "@nestjs/common";
 import { ORDER_REPOSITORY } from "./domain/repositories/order.repository";
 import { PrismaOrderRepository } from "./infrastructure/persistence/prisma-order.repository";
-import { CreateOrderHandler } from "./application/commands/create-order.handler";
+import { CreateOrder } from "./application/commands/create-order.handler";
 import { OrdersController } from "./orders.controller";
 
 @Module({
   controllers: [OrdersController],
   providers: [
-    CreateOrderHandler,
+    CreateOrder,
     {
       provide: ORDER_REPOSITORY,
       useClass: PrismaOrderRepository,
@@ -457,4 +457,4 @@ class Order {
 | Repository          | Persistence abstraction | OrderRepository         |
 | Domain Service      | Cross-entity logic      | PricingService          |
 | Domain Event        | Record state changes    | OrderCreatedEvent       |
-| Application Service | Orchestrates use cases  | CreateOrderHandler      |
+| Application Service | Orchestrates use cases  | CreateOrder      |

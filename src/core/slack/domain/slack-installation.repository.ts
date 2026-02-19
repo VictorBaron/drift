@@ -15,9 +15,7 @@ export abstract class SlackInstallationRepository extends RepositoryPort<SlackIn
     enterpriseId,
   }: SlackInstallationLookup): Promise<SlackInstallation | null>;
   abstract findByTeamId(teamId: string): Promise<SlackInstallation | null>;
-  abstract findByEnterpriseId(
-    enterpriseId: string,
-  ): Promise<SlackInstallation | null>;
+  abstract findByEnterpriseId(enterpriseId: string): Promise<SlackInstallation | null>;
   abstract save(slackInstallation: SlackInstallation): Promise<void>;
   abstract delete(slackInstallation: SlackInstallation): Promise<void>;
 }

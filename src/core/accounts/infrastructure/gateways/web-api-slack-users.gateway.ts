@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WebClient } from '@slack/web-api';
 
-import type {
-  SlackUserInfo,
-  SlackUsersGateway,
-} from '@/accounts/domain/gateways/slack-users.gateway';
+import type { SlackUserInfo, SlackUsersGateway } from '@/accounts/domain/gateways/slack-users.gateway';
 
 @Injectable()
 export class WebApiSlackUsersGateway implements SlackUsersGateway {

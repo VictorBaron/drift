@@ -12,9 +12,6 @@ import { ConversationPersistenceModule } from './infrastructure/persistence/conv
       useClass: WebApiSlackConversationsGateway,
     },
   ],
-  exports: [
-    ConversationPersistenceModule.use('orm'),
-    SLACK_CONVERSATIONS_GATEWAY,
-  ],
+  exports: [ConversationPersistenceModule.use('orm'), SLACK_CONVERSATIONS_GATEWAY],
 })
 export class ConversationsModule {}

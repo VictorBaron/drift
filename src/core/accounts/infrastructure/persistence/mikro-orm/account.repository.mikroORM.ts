@@ -30,11 +30,7 @@ export class AccountRepositoryMikroOrm
   }
 
   async findAll(): Promise<Account[]> {
-    const entities = await this.em.find(
-      AccountMikroOrm,
-      {},
-      { orderBy: { name: 'ASC' } },
-    );
+    const entities = await this.em.find(AccountMikroOrm, {}, { orderBy: { name: 'ASC' } });
     return entities.map((e) => AccountMapper.toDomain(e));
   }
 }

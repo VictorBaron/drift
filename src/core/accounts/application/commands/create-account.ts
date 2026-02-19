@@ -1,11 +1,6 @@
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
-import {
-  Account,
-  AccountRepository,
-  Member,
-  MemberRepository,
-} from '@/accounts/domain';
+import { BaseCommand } from 'src/common/application/command-handler';
+import { Account, AccountRepository, Member, MemberRepository } from '@/accounts/domain';
 import { UserRepository } from '@/users/domain';
 
 export class CreateAccountCommand {
@@ -19,7 +14,7 @@ export class CreateAccountCommand {
 }
 
 @CommandHandler(CreateAccountCommand)
-export class CreateAccountHandler extends BaseCommandHandler<CreateAccountCommand> {
+export class CreateAccount extends BaseCommand<CreateAccountCommand> {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly memberRepository: MemberRepository,
@@ -38,9 +33,7 @@ export class CreateAccountHandler extends BaseCommandHandler<CreateAccountComman
 
     const creatorUser = await this.userRepository.findById(creatorUserId);
     if (!creatorUser) {
-      this.logger.error(
-        `Could not find creator user when creating account: ${JSON.stringify(command.props)}`,
-      );
+      this.logger.error(`Could not find creator user when creating account: ${JSON.stringify(command.props)}`);
       throw new Error('Could not find creator user when creating account');
     }
 

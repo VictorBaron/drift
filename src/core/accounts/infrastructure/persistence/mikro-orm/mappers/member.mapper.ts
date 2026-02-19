@@ -7,8 +7,7 @@ import { MemberMikroOrm } from '../models/member.mikroORM';
 
 export class MemberMapper {
   static toDomain(raw: MemberMikroOrm): Member {
-    if (!raw.account)
-      throw new Error('Error reconstructing Member: missing account');
+    if (!raw.account) throw new Error('Error reconstructing Member: missing account');
     if (!raw.user) throw new Error('Error reconstructing Member: missing user');
     return Member.reconstitute({
       id: raw.id,

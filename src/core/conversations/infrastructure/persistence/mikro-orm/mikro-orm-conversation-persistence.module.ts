@@ -8,10 +8,7 @@ import { ConversationRepositoryMikroOrm } from './conversation.repository.mikroO
 import { ConversationMikroOrm } from './models/conversation.mikroORM';
 
 @Module({
-  imports: [
-    MikroOrmModule.forFeature([ConversationMikroOrm]),
-    PersistenceModule,
-  ],
+  imports: [MikroOrmModule.forFeature([ConversationMikroOrm]), PersistenceModule],
   providers: [
     {
       provide: ConversationRepository,

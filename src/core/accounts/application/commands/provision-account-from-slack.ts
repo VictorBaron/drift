@@ -1,5 +1,5 @@
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { Account, AccountRepository } from '@/accounts/domain';
 import { SlackChannelsImportService } from '../services/slack-channels-import.service';
 import { SlackConversationsImportService } from '../services/slack-conversations-import.service';
@@ -17,7 +17,7 @@ export class ProvisionAccountFromSlackCommand {
 }
 
 @CommandHandler(ProvisionAccountFromSlackCommand)
-export class ProvisionAccountFromSlackHandler extends BaseCommandHandler<ProvisionAccountFromSlackCommand> {
+export class ProvisionAccountFromSlack extends BaseCommand<ProvisionAccountFromSlackCommand> {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly slackUsersImport: SlackUsersImportService,
@@ -46,13 +46,7 @@ export class ProvisionAccountFromSlackHandler extends BaseCommandHandler<Provisi
     });
   }
 
-  private async findOrCreateAccount({
-    teamId,
-    teamName,
-  }: {
-    teamId: string;
-    teamName: string;
-  }): Promise<Account> {
+  private async findOrCreateAccount({ teamId, teamName }: { teamId: string; teamName: string }): Promise<Account> {
     const existing = await this.accountRepository.findBySlackTeamId(teamId);
     if (existing) return existing;
 

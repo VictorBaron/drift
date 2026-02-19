@@ -2,22 +2,17 @@ import { ConflictException, ForbiddenException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
-import {
-  type Member,
-  MemberInvitedEvent,
-  type MemberJSON,
-  MemberRepository,
-} from '@/accounts/domain';
+import { type Member, MemberInvitedEvent, type MemberJSON, MemberRepository } from '@/accounts/domain';
 import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { Email, type User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
-import { InviteMemberCommand, InviteMemberHandler } from './invite-member';
+import { InviteMember, InviteMemberCommand } from './invite-member';
 
 describe('Invite member', () => {
-  let handler: InviteMemberHandler;
+  let handler: InviteMember;
   let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
 
@@ -29,13 +24,13 @@ describe('Invite member', () => {
 
     const module = await Test.createTestingModule({
       providers: [
-        InviteMemberHandler,
+        InviteMember,
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
       ],
     }).compile();
 
-    handler = module.get<InviteMemberHandler>(InviteMemberHandler);
+    handler = module.get<InviteMember>(InviteMember);
 
     memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
@@ -98,12 +93,8 @@ describe('Invite member', () => {
         actor: inviter,
       });
 
-      await expect(handler.execute(command)).rejects.toThrow(
-        ForbiddenException,
-      );
-      await expect(handler.execute(command)).rejects.toThrow(
-        'Only active admins can invite new members',
-      );
+      await expect(handler.execute(command)).rejects.toThrow(ForbiddenException);
+      await expect(handler.execute(command)).rejects.toThrow('Only active admins can invite new members');
     });
   });
 
@@ -122,12 +113,8 @@ describe('Invite member', () => {
         actor: inviter,
       });
 
-      await expect(handler.execute(command)).rejects.toThrow(
-        ForbiddenException,
-      );
-      await expect(handler.execute(command)).rejects.toThrow(
-        'Only active admins can invite new members',
-      );
+      await expect(handler.execute(command)).rejects.toThrow(ForbiddenException);
+      await expect(handler.execute(command)).rejects.toThrow('Only active admins can invite new members');
     });
 
     it('should throw ForbiddenException when inviter is disabled', async () => {
@@ -146,12 +133,8 @@ describe('Invite member', () => {
         actor: inviter,
       });
 
-      await expect(handler.execute(command)).rejects.toThrow(
-        ForbiddenException,
-      );
-      await expect(handler.execute(command)).rejects.toThrow(
-        'Only active admins can invite new members',
-      );
+      await expect(handler.execute(command)).rejects.toThrow(ForbiddenException);
+      await expect(handler.execute(command)).rejects.toThrow('Only active admins can invite new members');
     });
   });
 
@@ -182,12 +165,8 @@ describe('Invite member', () => {
           actor: inviter,
         });
 
-        await expect(handler.execute(command)).rejects.toThrow(
-          ConflictException,
-        );
-        await expect(handler.execute(command)).rejects.toThrow(
-          'User is already a member of this account',
-        );
+        await expect(handler.execute(command)).rejects.toThrow(ConflictException);
+        await expect(handler.execute(command)).rejects.toThrow('User is already a member of this account');
       });
     });
 

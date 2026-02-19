@@ -5,8 +5,7 @@ import { MikroOrmConversationPersistenceModule } from './mikro-orm/mikro-orm-con
 @Module({})
 export class ConversationPersistenceModule {
   static use(driver: 'orm'): DynamicModule {
-    const persistenceModule =
-      driver === 'orm' ? MikroOrmConversationPersistenceModule : null;
+    const persistenceModule = driver === 'orm' ? MikroOrmConversationPersistenceModule : null;
 
     if (!persistenceModule) {
       throw new Error(`Unsupported persistence driver: ${driver}`);

@@ -1,10 +1,6 @@
 import type { AggregateRootProps } from 'common/domain';
 
-import type {
-  MemberPreferences,
-  MemberRole,
-  MemberRoleLevel,
-} from '@/accounts/domain/value-objects';
+import type { MemberPreferences, MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { User } from '@/users/domain';
 import type { Member } from './member.aggregate';
 

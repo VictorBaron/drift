@@ -1,15 +1,7 @@
 import { z } from 'zod';
 
 export const MessageAnalysisSchema = z.object({
-  intent: z.enum([
-    'inform',
-    'ask',
-    'decide',
-    'approve',
-    'coordinate',
-    'resolve',
-    'unknown',
-  ]),
+  intent: z.enum(['inform', 'ask', 'decide', 'approve', 'coordinate', 'resolve', 'unknown']),
 
   category: z.enum([
     'incident',
@@ -40,14 +32,7 @@ export const MessageAnalysisSchema = z.object({
     'unknown',
   ]),
 
-  timeSensitivity: z.enum([
-    'minutes',
-    'hours',
-    'today',
-    'this_week',
-    'whenever',
-    'unknown',
-  ]),
+  timeSensitivity: z.enum(['minutes', 'hours', 'today', 'this_week', 'whenever', 'unknown']),
   deadlineAtIso: z.string().datetime().nullable(),
 
   blocking: z.boolean(),

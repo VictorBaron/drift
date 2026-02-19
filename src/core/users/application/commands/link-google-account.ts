@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { User, UserRepository } from '@/users/domain';
 
 export class LinkGoogleAccountCommand {
@@ -14,7 +14,7 @@ export class LinkGoogleAccountCommand {
 }
 
 @CommandHandler(LinkGoogleAccountCommand)
-export class LinkGoogleAccountHandler extends BaseCommandHandler<LinkGoogleAccountCommand> {
+export class LinkGoogleAccount extends BaseCommand<LinkGoogleAccountCommand> {
   constructor(private readonly repository: UserRepository) {
     super();
   }

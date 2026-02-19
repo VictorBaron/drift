@@ -1,7 +1,7 @@
-import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import { Collection, Entity, ManyToMany, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
-import { AccountMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
+import { AccountMikroOrm, MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
 
 @Entity({ tableName: 'channel' })
 @Unique({ properties: ['account', 'slackChannelId'] })
@@ -27,11 +27,13 @@ export class ChannelMikroOrm extends PersistenceEntity {
   @Property({ type: 'boolean', default: false })
   isArchived: boolean;
 
-  @Property({ type: 'int', default: 0 })
-  memberCount: number;
+  @ManyToMany(() => MemberMikroOrm, 'channels', { owner: true })
+  members = new Collection<MemberMikroOrm>(this);
 
   static build(
-    props: OwnPersistenceEntityProperties<ChannelMikroOrm>,
+    props: OwnPersistenceEntityProperties<ChannelMikroOrm> & {
+      members: ChannelMikroOrm['members'];
+    },
   ): ChannelMikroOrm {
     return Object.assign(new ChannelMikroOrm(), props);
   }

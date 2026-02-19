@@ -2,10 +2,7 @@ import { Test } from '@nestjs/testing';
 
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
-import {
-  SLACK_USERS_GATEWAY,
-  type SlackUserInfo,
-} from '@/accounts/domain/gateways/slack-users.gateway';
+import { SLACK_USERS_GATEWAY, type SlackUserInfo } from '@/accounts/domain/gateways/slack-users.gateway';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
 import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
@@ -25,10 +22,7 @@ import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { Email, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
-import {
-  ProvisionAccountFromSlackCommand,
-  ProvisionAccountFromSlackHandler,
-} from './provision-account-from-slack';
+import { ProvisionAccountFromSlack, ProvisionAccountFromSlackCommand } from './provision-account-from-slack';
 
 const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
   slackId: 'U_INSTALLER',
@@ -39,9 +33,7 @@ const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
   ...overrides,
 });
 
-const makeSlackConversation = (
-  overrides?: Partial<SlackConversationInfo>,
-): SlackConversationInfo => ({
+const makeSlackConversation = (overrides?: Partial<SlackConversationInfo>): SlackConversationInfo => ({
   slackConversationId: 'D_001',
   memberSlackIds: ['U_INSTALLER', 'U_OTHER'],
   isGroupDm: false,
@@ -49,7 +41,7 @@ const makeSlackConversation = (
 });
 
 describe('Provision Account From Slack — Conversation Import', () => {
-  let handler: ProvisionAccountFromSlackHandler;
+  let handler: ProvisionAccountFromSlack;
   let accountRepository: AccountRepositoryInMemory;
   let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
@@ -61,7 +53,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        ProvisionAccountFromSlackHandler,
+        ProvisionAccountFromSlack,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
@@ -79,20 +71,14 @@ describe('Provision Account From Slack — Conversation Import', () => {
       ],
     }).compile();
 
-    handler = module.get(ProvisionAccountFromSlackHandler);
-    accountRepository =
-      module.get<AccountRepositoryInMemory>(AccountRepository);
+    handler = module.get(ProvisionAccountFromSlack);
+    accountRepository = module.get<AccountRepositoryInMemory>(AccountRepository);
     memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
     slackUsersGateway = module.get<FakeSlackUsersGateway>(SLACK_USERS_GATEWAY);
-    channelRepository =
-      module.get<ChannelRepositoryInMemory>(ChannelRepository);
-    conversationRepository = module.get<ConversationRepositoryInMemory>(
-      ConversationRepository,
-    );
-    slackConversationsGateway = module.get<FakeSlackConversationsGateway>(
-      SLACK_CONVERSATIONS_GATEWAY,
-    );
+    channelRepository = module.get<ChannelRepositoryInMemory>(ChannelRepository);
+    conversationRepository = module.get<ConversationRepositoryInMemory>(ConversationRepository);
+    slackConversationsGateway = module.get<FakeSlackConversationsGateway>(SLACK_CONVERSATIONS_GATEWAY);
 
     slackUsersGateway.setUsers([
       makeSlackUser({ slackId: 'U_INSTALLER', name: 'Installer' }),
@@ -134,25 +120,19 @@ describe('Provision Account From Slack — Conversation Import', () => {
       await executeCommand();
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const conversations = await conversationRepository.findByAccountId(
-        account!.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       expect(conversations).toHaveLength(1);
       expect(conversations[0].toJSON().slackConversationId).toBe('D_001');
     });
 
     it('should store isGroupDm as false for 1:1 DMs', async () => {
-      slackConversationsGateway.setConversations([
-        makeSlackConversation({ isGroupDm: false }),
-      ]);
+      slackConversationsGateway.setConversations([makeSlackConversation({ isGroupDm: false })]);
 
       await executeCommand();
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const conversations = await conversationRepository.findByAccountId(
-        account!.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       expect(conversations[0].toJSON().isGroupDm).toBe(false);
     });
@@ -177,9 +157,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
       await executeCommand();
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const conversations = await conversationRepository.findByAccountId(
-        account!.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       expect(conversations).toHaveLength(1);
       expect(conversations[0].toJSON().isGroupDm).toBe(true);
@@ -199,9 +177,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
       await executeCommand();
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const conversations = await conversationRepository.findByAccountId(
-        account!.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       const json = conversations[0].toJSON();
       const installerUser = await userRepository.findBySlackId('U_INSTALLER');
@@ -224,9 +200,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
       await executeCommand();
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const conversations = await conversationRepository.findByAccountId(
-        account!.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       expect(conversations[0].toJSON()).toMatchObject({
         accountId: account!.getId(),
@@ -248,16 +222,12 @@ describe('Provision Account From Slack — Conversation Import', () => {
       ]);
 
       // U_UNKNOWN_OUTSIDER is not in slackUsersGateway so won't be imported
-      slackUsersGateway.setUsers([
-        makeSlackUser({ slackId: 'U_INSTALLER', name: 'Installer' }),
-      ]);
+      slackUsersGateway.setUsers([makeSlackUser({ slackId: 'U_INSTALLER', name: 'Installer' })]);
 
       await executeCommand();
 
       const account = await accountRepository.findBySlackTeamId('T_ACME');
-      const conversations = await conversationRepository.findByAccountId(
-        account!.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       expect(conversations).toHaveLength(0);
     });
@@ -369,9 +339,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
 
       await executeCommand();
 
-      const conversations = await conversationRepository.findByAccountId(
-        existingAccount.getId(),
-      );
+      const conversations = await conversationRepository.findByAccountId(existingAccount.getId());
       expect(conversations).toHaveLength(2);
 
       const newConv = await conversationRepository.findBySlackConversationId({

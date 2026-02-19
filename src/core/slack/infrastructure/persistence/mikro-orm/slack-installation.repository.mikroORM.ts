@@ -23,10 +23,7 @@ export class SlackInstallationRepositoryMikroOrm
     super(em, eventBus, SlackInstallationMapper, SlackInstallationMikroOrm);
   }
 
-  async findByTeamAndEnterprise({
-    teamId,
-    enterpriseId,
-  }: SlackInstallationLookup): Promise<SlackInstallation | null> {
+  async findByTeamAndEnterprise({ teamId, enterpriseId }: SlackInstallationLookup): Promise<SlackInstallation | null> {
     const entity = await this.em.findOne(SlackInstallationMikroOrm, {
       teamId,
       enterpriseId,
@@ -43,9 +40,7 @@ export class SlackInstallationRepositoryMikroOrm
     return entity ? SlackInstallationMapper.toDomain(entity) : null;
   }
 
-  async findByEnterpriseId(
-    enterpriseId: string,
-  ): Promise<SlackInstallation | null> {
+  async findByEnterpriseId(enterpriseId: string): Promise<SlackInstallation | null> {
     const entity = await this.em.findOne(SlackInstallationMikroOrm, {
       enterpriseId,
       deletedAt: null,

@@ -2,12 +2,7 @@ import { AggregateRoot } from 'common/domain';
 
 import { ChannelImportedEvent } from '@/channels/domain/events/channel-events';
 
-import type {
-  ChannelJSON,
-  ChannelProps,
-  CreateChannelProps,
-  UpdateChannelProps,
-} from './channel.types';
+import type { ChannelJSON, ChannelProps, CreateChannelProps, UpdateChannelProps } from './channel.types';
 
 export class Channel extends AggregateRoot {
   private accountId: string;
@@ -17,7 +12,7 @@ export class Channel extends AggregateRoot {
   private purpose: string;
   private isPrivate: boolean;
   private isArchived: boolean;
-  private memberCount: number;
+  private memberIds: string[];
 
   private constructor(props: ChannelProps) {
     super({
@@ -33,7 +28,7 @@ export class Channel extends AggregateRoot {
     this.purpose = props.purpose;
     this.isPrivate = props.isPrivate;
     this.isArchived = props.isArchived;
-    this.memberCount = props.memberCount;
+    this.memberIds = props.memberIds;
   }
 
   static create(props: CreateChannelProps): Channel {
@@ -48,7 +43,7 @@ export class Channel extends AggregateRoot {
       purpose: props.purpose,
       isPrivate: props.isPrivate,
       isArchived: props.isArchived,
-      memberCount: props.memberCount,
+      memberIds: props.memberIds,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -74,8 +69,12 @@ export class Channel extends AggregateRoot {
     this.purpose = props.purpose;
     this.isPrivate = props.isPrivate;
     this.isArchived = props.isArchived;
-    this.memberCount = props.memberCount;
+    this.memberIds = props.memberIds;
     this.updatedAt = new Date();
+  }
+
+  getMemberIds(): string[] {
+    return this.memberIds;
   }
 
   getId(): string {
@@ -92,7 +91,7 @@ export class Channel extends AggregateRoot {
       purpose: this.purpose,
       isPrivate: this.isPrivate,
       isArchived: this.isArchived,
-      memberCount: this.memberCount,
+      memberIds: this.memberIds,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,

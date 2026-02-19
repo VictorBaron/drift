@@ -10,12 +10,7 @@ import {
 } from '@/accounts/domain/events';
 import { MemberPreferences, MemberRole } from '@/accounts/domain/value-objects';
 import { User } from '@/users/domain';
-import type {
-  CreateFounderMemberProps,
-  CreateMemberProps,
-  MemberJSON,
-  MemberProps,
-} from './member.types';
+import type { CreateFounderMemberProps, CreateMemberProps, MemberJSON, MemberProps } from './member.types';
 
 export class Member extends AggregateRoot {
   private accountId: string;
@@ -109,9 +104,7 @@ export class Member extends AggregateRoot {
       throw new ForbiddenException('Only active admins can invite new members');
     }
     if (actor.accountId !== this.accountId) {
-      throw new ForbiddenException(
-        'Trying to invite a member from another account',
-      );
+      throw new ForbiddenException('Trying to invite a member from another account');
     }
 
     const now = new Date();
@@ -209,9 +202,7 @@ export class Member extends AggregateRoot {
       throw new ForbiddenException('Members cannot change their own role');
     }
     if (!actor.canChangeRole()) {
-      throw new ForbiddenException(
-        'Only admin members can change member roles',
-      );
+      throw new ForbiddenException('Only admin members can change member roles');
     }
     const previousRole = this.role;
     this.role = role;
@@ -255,16 +246,8 @@ export class Member extends AggregateRoot {
     return this.user.getId();
   }
 
-  identify({
-    accountId,
-    slackUserId,
-  }: {
-    accountId: string;
-    slackUserId: string;
-  }) {
-    return (
-      this.accountId === accountId && this.user.getSlackId() === slackUserId
-    );
+  identify({ accountId, slackUserId }: { accountId: string; slackUserId: string }) {
+    return this.accountId === accountId && this.user.getSlackId() === slackUserId;
   }
 
   toJSON(): MemberJSON {

@@ -1,6 +1,6 @@
 import { ConflictException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { Member, MemberRepository } from '@/accounts/domain';
 import { User, UserRepository } from '@/users/domain';
 
@@ -14,7 +14,7 @@ export class InviteMemberCommand {
 }
 
 @CommandHandler(InviteMemberCommand)
-export class InviteMemberHandler extends BaseCommandHandler<InviteMemberCommand> {
+export class InviteMember extends BaseCommand<InviteMemberCommand> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly memberRepository: MemberRepository,
@@ -28,12 +28,10 @@ export class InviteMemberHandler extends BaseCommandHandler<InviteMemberCommand>
 
     const user = await this.findOrCreateUser(email);
 
-    const existingMember = await this.memberRepository.findByAccountIdAndUserId(
-      {
-        accountId,
-        userId: user.id,
-      },
-    );
+    const existingMember = await this.memberRepository.findByAccountIdAndUserId({
+      accountId,
+      userId: user.id,
+    });
 
     if (!existingMember) {
       const member = Member.invite({

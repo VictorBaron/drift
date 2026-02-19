@@ -7,12 +7,8 @@ import type {
 } from '@/conversations/domain/gateways/slack-conversations.gateway';
 
 @Injectable()
-export class WebApiSlackConversationsGateway
-  implements SlackConversationsGateway
-{
-  async listUserConversations(
-    userToken: string,
-  ): Promise<SlackConversationInfo[]> {
+export class WebApiSlackConversationsGateway implements SlackConversationsGateway {
+  async listUserConversations(userToken: string): Promise<SlackConversationInfo[]> {
     const client = new WebClient(userToken);
     const conversations: SlackConversationInfo[] = [];
     let cursor: string | undefined;

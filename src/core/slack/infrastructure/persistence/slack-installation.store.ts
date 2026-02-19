@@ -1,15 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import type {
-  Installation,
-  InstallationQuery,
-  InstallationStore,
-} from '@slack/bolt';
+import type { Installation, InstallationQuery, InstallationStore } from '@slack/bolt';
 import { ProvisionAccountFromSlackCommand } from '@/accounts/application/commands/provision-account-from-slack';
-import {
-  type CreateSlackInstallationProps,
-  SlackInstallation,
-} from '@/slack/domain/slack-installation.aggregate';
+import { type CreateSlackInstallationProps, SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
 import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
 import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
 
@@ -56,11 +49,7 @@ export class SlackInstallationStore implements InstallationStore {
     );
   }
 
-  async createOrUpdate({
-    fields,
-  }: {
-    fields: CreateSlackInstallationProps;
-  }): Promise<SlackInstallation> {
+  async createOrUpdate({ fields }: { fields: CreateSlackInstallationProps }): Promise<SlackInstallation> {
     const { teamId, enterpriseId } = fields;
     const existing = await this.repository.findByTeamAndEnterprise({
       teamId,
@@ -79,15 +68,11 @@ export class SlackInstallationStore implements InstallationStore {
     return slackInstallation;
   }
 
-  async fetchInstallation(
-    query: InstallationQuery<boolean>,
-  ): Promise<Installation<'v1' | 'v2', boolean>> {
+  async fetchInstallation(query: InstallationQuery<boolean>): Promise<Installation<'v1' | 'v2', boolean>> {
     const entity = await this.findByQuery(query);
 
     if (!entity) {
-      throw new Error(
-        `Installation not found for team=${query.teamId} enterprise=${query.enterpriseId}`,
-      );
+      throw new Error(`Installation not found for team=${query.teamId} enterprise=${query.enterpriseId}`);
     }
 
     return SlackInstallationMapper.toInstallation(entity);
@@ -97,9 +82,7 @@ export class SlackInstallationStore implements InstallationStore {
     const slackInstallation = await this.findByQuery(query);
 
     if (!slackInstallation) {
-      throw new Error(
-        `Installation not found for team=${query.teamId} enterprise=${query.enterpriseId}`,
-      );
+      throw new Error(`Installation not found for team=${query.teamId} enterprise=${query.enterpriseId}`);
     }
     slackInstallation.delete();
 
@@ -115,8 +98,6 @@ export class SlackInstallationStore implements InstallationStore {
       return this.repository.findByTeamId(query.teamId);
     }
 
-    throw new Error(
-      'Either teamId or enterpriseId is required to look up an installation',
-    );
+    throw new Error('Either teamId or enterpriseId is required to look up an installation');
   }
 }

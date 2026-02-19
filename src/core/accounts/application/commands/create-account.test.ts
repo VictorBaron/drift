@@ -14,10 +14,10 @@ import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
-import { CreateAccountCommand, CreateAccountHandler } from './create-account';
+import { CreateAccount, CreateAccountCommand } from './create-account';
 
 describe('Create Account', () => {
-  let handler: CreateAccountHandler;
+  let handler: CreateAccount;
   let accountRepository: AccountRepositoryInMemory;
   let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
@@ -25,16 +25,15 @@ describe('Create Account', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        CreateAccountHandler,
+        CreateAccount,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
       ],
     }).compile();
 
-    handler = module.get<CreateAccountHandler>(CreateAccountHandler);
-    accountRepository =
-      module.get<AccountRepositoryInMemory>(AccountRepository);
+    handler = module.get<CreateAccount>(CreateAccount);
+    accountRepository = module.get<AccountRepositoryInMemory>(AccountRepository);
     memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
 

@@ -66,14 +66,14 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
   }
 
   onModuleInit() {
-    this.registerEventHandlers();
+    this.registerEvents();
   }
 
   getExpressApp(): Application {
     return this.receiver.app;
   }
 
-  private registerEventHandlers() {
+  private registerEvents() {
     this.bolt.event('message', async ({ event }) => {
       if (!isGenericMessage(event)) {
         this.logger.log(`Received non generic message of type ${event.type}`);

@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
+import { BaseCommand } from 'src/common/application/command-handler';
 import { Member, MemberRepository } from '@/accounts/domain';
 
 export class DisableMemberCommand {
@@ -14,7 +14,7 @@ export class DisableMemberCommand {
 }
 
 @CommandHandler(DisableMemberCommand)
-export class DisableMemberHandler extends BaseCommandHandler<DisableMemberCommand> {
+export class DisableMember extends BaseCommand<DisableMemberCommand> {
   constructor(private readonly memberRepository: MemberRepository) {
     super();
   }

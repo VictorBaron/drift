@@ -1,7 +1,4 @@
-import type {
-  SlackChannelInfo,
-  SlackChannelsGateway,
-} from '@/channels/domain/gateways/slack-channels.gateway';
+import type { SlackChannelInfo, SlackChannelsGateway } from '@/channels/domain/gateways/slack-channels.gateway';
 
 export class FakeSlackChannelsGateway implements SlackChannelsGateway {
   private channels: SlackChannelInfo[] = [];

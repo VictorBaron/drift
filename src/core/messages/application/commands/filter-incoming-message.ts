@@ -1,13 +1,12 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import type { GenericMessageEvent } from '@slack/types';
-import { BaseCommandHandler } from 'src/common/application/command-handler';
-import { AccountRepository, MemberRepository } from '@/accounts';
+import { BaseCommand } from 'src/common/application/command-handler';
+import { AccountRepository, Member, MemberRepository } from '@/accounts';
+import { ChannelRepository } from '@/channels/domain';
+import { ConversationRepository } from '@/conversations/domain';
 import { Message, MessageRepository } from '@/messages/domain';
-import {
-  URGENCY_SCORING_GATEWAY,
-  type UrgencyScoringGateway,
-} from '@/scoring/domain/gateways';
+import { URGENCY_SCORING_GATEWAY, type UrgencyScoringGateway } from '@/scoring/domain/gateways';
 
 export class FilterIncomingMessageCommand {
   constructor(
@@ -18,7 +17,7 @@ export class FilterIncomingMessageCommand {
 }
 
 @CommandHandler(FilterIncomingMessageCommand)
-export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncomingMessageCommand> {
+export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageCommand> {
   constructor(
     @Inject(MessageRepository)
     private readonly messageRepository: MessageRepository,
@@ -26,15 +25,17 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
     private accountRepository: AccountRepository,
     @Inject(MemberRepository)
     private memberRepository: MemberRepository,
+    @Inject(ChannelRepository)
+    private channelRepository: ChannelRepository,
+    @Inject(ConversationRepository)
+    private conversationRepository: ConversationRepository,
     @Inject(URGENCY_SCORING_GATEWAY)
     private scoringGateway: UrgencyScoringGateway,
   ) {
     super();
   }
 
-  async execute(
-    command: FilterIncomingMessageCommand,
-  ): Promise<Message | null> {
+  async execute(command: FilterIncomingMessageCommand): Promise<Message | null> {
     const { messageEvent } = command.props;
 
     this.logger.log(messageEvent);
@@ -49,6 +50,13 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
       user: messageEvent.user,
     });
 
+    const recipients = await this.getRecipients({
+      accountId: sender.getAccountId(),
+      senderId: sender.getId(),
+      slackChannelId: messageEvent.channel,
+      channelType: messageEvent.channel_type,
+    });
+
     const message = Message.create({
       sender,
       text: messageEvent.text,
@@ -60,6 +68,7 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
 
     const { score, reasoning } = await this.scoringGateway.scoreMessage({
       text: messageEvent.text,
+      recipients,
     });
     message.setUrgencyScore({ score, reasoning });
 
@@ -84,5 +93,44 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
       throw new Error(`No user found for Slack user ${user}`);
     }
     return sender;
+  }
+
+  private async getRecipients({
+    accountId,
+    senderId,
+    slackChannelId,
+    channelType,
+  }: {
+    accountId: string;
+    senderId: string;
+    slackChannelId: string;
+    channelType: GenericMessageEvent['channel_type'];
+  }): Promise<Member[]> {
+    const isGroupOrChannel = (channelType: GenericMessageEvent['channel_type']) =>
+      channelType === 'channel' || channelType === 'group';
+
+    const findMembersInConversation = async () => {
+      if (isGroupOrChannel(channelType)) {
+        const channel = await this.channelRepository.findBySlackChannelId({
+          accountId,
+          slackChannelId,
+        });
+        if (!channel) return [];
+
+        return this.memberRepository.findManyByIds(channel.getMemberIds());
+      }
+
+      const conversation = await this.conversationRepository.findBySlackConversationId({
+        accountId,
+        slackConversationId: slackChannelId,
+      });
+      if (!conversation) return [];
+
+      return this.memberRepository.findManyByIds(conversation.toJSON().memberIds);
+    };
+
+    const members = await findMembersInConversation();
+
+    return members.filter((m) => m.getId() !== senderId);
   }
 }

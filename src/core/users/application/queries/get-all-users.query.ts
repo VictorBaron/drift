@@ -5,7 +5,7 @@ import { User, UserRepository } from '@/users/domain';
 export class GetAllUsersQuery {}
 
 @Injectable()
-export class GetAllUsersHandler {
+export class GetAllUsers {
   constructor(private readonly repository: UserRepository) {}
 
   async execute(): Promise<User[]> {

@@ -3,10 +3,7 @@ import { Test } from '@nestjs/testing';
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
-import {
-  SLACK_USERS_GATEWAY,
-  type SlackUserInfo,
-} from '@/accounts/domain/gateways/slack-users.gateway';
+import { SLACK_USERS_GATEWAY, type SlackUserInfo } from '@/accounts/domain/gateways/slack-users.gateway';
 import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
@@ -18,10 +15,7 @@ import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence
 import { User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
-import {
-  ProvisionAccountFromSlackCommand,
-  ProvisionAccountFromSlackHandler,
-} from './provision-account-from-slack';
+import { ProvisionAccountFromSlack, ProvisionAccountFromSlackCommand } from './provision-account-from-slack';
 
 const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
   slackId: 'U001',
@@ -33,7 +27,7 @@ const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
 });
 
 describe('Provision Account From Slack', () => {
-  let handler: ProvisionAccountFromSlackHandler;
+  let handler: ProvisionAccountFromSlack;
   let accountRepository: AccountRepositoryInMemory;
   let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
@@ -42,7 +36,7 @@ describe('Provision Account From Slack', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        ProvisionAccountFromSlackHandler,
+        ProvisionAccountFromSlack,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
@@ -52,9 +46,8 @@ describe('Provision Account From Slack', () => {
       ],
     }).compile();
 
-    handler = module.get(ProvisionAccountFromSlackHandler);
-    accountRepository =
-      module.get<AccountRepositoryInMemory>(AccountRepository);
+    handler = module.get(ProvisionAccountFromSlack);
+    accountRepository = module.get<AccountRepositoryInMemory>(AccountRepository);
     memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
     slackUsersGateway = module.get<FakeSlackUsersGateway>(SLACK_USERS_GATEWAY);
@@ -153,9 +146,7 @@ describe('Provision Account From Slack', () => {
       expect(members).toHaveLength(3);
 
       const alice = await userRepository.findBySlackId('U002');
-      const aliceMember = members.find(
-        (m) => m.toJSON().userId === alice!.getId(),
-      );
+      const aliceMember = members.find((m) => m.toJSON().userId === alice!.getId());
       expect(aliceMember?.toJSON()).toMatchObject({
         role: MemberRoleLevel.USER,
       });
@@ -287,18 +278,12 @@ describe('Provision Account From Slack', () => {
 
       await handler.execute(command2);
 
-      const aliceUsers = (await userRepository.findAll()).filter(
-        (u) => u.getSlackId() === 'U002',
-      );
+      const aliceUsers = (await userRepository.findAll()).filter((u) => u.getSlackId() === 'U002');
       expect(aliceUsers).toHaveLength(1);
 
       const account2 = await accountRepository.findBySlackTeamId('T_OTHER');
-      const members2 = await memberRepository.findByAccountId(
-        account2!.getId(),
-      );
-      const aliceMember = members2.find(
-        (m) => m.toJSON().userId === aliceAfterFirstRun!.getId(),
-      );
+      const members2 = await memberRepository.findByAccountId(account2!.getId());
+      const aliceMember = members2.find((m) => m.toJSON().userId === aliceAfterFirstRun!.getId());
       expect(aliceMember).toBeDefined();
     });
   });
@@ -355,12 +340,8 @@ describe('Provision Account From Slack', () => {
       const newUser = await userRepository.findBySlackId('U_NEW');
       expect(newUser).not.toBeNull();
 
-      const members = await memberRepository.findByAccountId(
-        existingAccount.getId(),
-      );
-      const newMember = members.find(
-        (m) => m.toJSON().userId === newUser!.getId(),
-      );
+      const members = await memberRepository.findByAccountId(existingAccount.getId());
+      const newMember = members.find((m) => m.toJSON().userId === newUser!.getId());
       expect(newMember).toBeDefined();
       expect(newMember?.toJSON()).toMatchObject({
         accountId: existingAccount.getId(),
@@ -405,12 +386,8 @@ describe('Provision Account From Slack', () => {
 
       await handler.execute(command);
 
-      const members = await memberRepository.findByAccountId(
-        existingAccount.getId(),
-      );
-      const membersForUser = members.filter(
-        (m) => m.toJSON().userId === existingUser.getId(),
-      );
+      const members = await memberRepository.findByAccountId(existingAccount.getId());
+      const membersForUser = members.filter((m) => m.toJSON().userId === existingUser.getId());
       expect(membersForUser).toHaveLength(1);
     });
 

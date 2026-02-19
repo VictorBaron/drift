@@ -27,9 +27,7 @@ export class SlackInstallationMapper {
     });
   }
 
-  static toPersistence(
-    slackInstallation: SlackInstallation,
-  ): SlackInstallationMikroOrm {
+  static toPersistence(slackInstallation: SlackInstallation): SlackInstallationMikroOrm {
     const json = slackInstallation.toJSON();
     const entity = SlackInstallationMikroOrm.build({
       id: json.id,
@@ -53,9 +51,7 @@ export class SlackInstallationMapper {
     return entity;
   }
 
-  static toInstallation(
-    slackInstallation: SlackInstallation,
-  ): Installation<'v1' | 'v2', boolean> {
+  static toInstallation(slackInstallation: SlackInstallation): Installation<'v1' | 'v2', boolean> {
     const json = slackInstallation.toJSON();
     return {
       team: { id: json.teamId ?? '', name: json.teamName ?? '' },

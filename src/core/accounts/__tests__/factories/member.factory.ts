@@ -1,9 +1,4 @@
-import {
-  Member,
-  MemberPreferences,
-  type MemberProps,
-  MemberRole,
-} from '@/accounts/domain';
+import { Member, MemberPreferences, type MemberProps, MemberRole } from '@/accounts/domain';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 
 export class MemberFactory {

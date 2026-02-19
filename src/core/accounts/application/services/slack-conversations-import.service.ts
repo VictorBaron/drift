@@ -18,39 +18,31 @@ export class SlackConversationsImportService extends BaseService {
     super();
   }
 
-  async importConversations({
-    account,
-    botToken,
-  }: {
-    account: Account;
-    botToken: string;
-  }): Promise<void> {
+  async importConversations({ account, botToken }: { account: Account; botToken: string }): Promise<void> {
     const accountId = account.getId();
-    const slackConversations =
-      await this.slackConversationsGateway.listUserConversations(botToken);
+    const slackConversations = await this.slackConversationsGateway.listUserConversations(botToken);
 
     this.logger.log(slackConversations);
 
-    const uniqueSlackUserIds = [
-      ...new Set(slackConversations.flatMap((conv) => conv.memberSlackIds)),
-    ];
+    const uniqueSlackUserIds = [...new Set(slackConversations.flatMap((conv) => conv.memberSlackIds))];
 
-    const allMembers = await this.resolveMembers(uniqueSlackUserIds, accountId);
+    const allMembers = await this.memberRepository.findManyByAccountIdAndSlackUserIds({
+      accountId,
+      slackUserIds: uniqueSlackUserIds,
+    });
 
     for (const sc of slackConversations) {
-      const resolvedMembers = allMembers.filter((member) =>
-        sc.memberSlackIds.some((slackUserId) =>
-          member.identify({ accountId, slackUserId }),
-        ),
-      );
+      const resolvedMembers = sc.memberSlackIds
+        .map((slackUserId) => allMembers.find((member) => member.identify({ accountId, slackUserId })))
+        .filter((member): member is Member => !!member);
+
       const memberIds = resolvedMembers.map((member) => member.getId());
       if (!resolvedMembers.length) continue;
 
-      const existing =
-        await this.conversationRepository.findBySlackConversationId({
-          accountId,
-          slackConversationId: sc.slackConversationId,
-        });
+      const existing = await this.conversationRepository.findBySlackConversationId({
+        accountId,
+        slackConversationId: sc.slackConversationId,
+      });
 
       if (existing) {
         existing.update({ memberIds });
@@ -66,21 +58,5 @@ export class SlackConversationsImportService extends BaseService {
       });
       await this.conversationRepository.save(conversation);
     }
-  }
-
-  private async resolveMembers(
-    memberSlackIds: string[],
-    accountId: string,
-  ): Promise<Member[]> {
-    const members: Member[] = [];
-    for (const slackUserId of memberSlackIds) {
-      const member = await this.memberRepository.findByAccountIdAndSlackUserId({
-        accountId,
-        slackUserId,
-      });
-      if (!member) continue;
-      members.push(member);
-    }
-    return members;
   }
 }
