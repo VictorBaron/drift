@@ -17,6 +17,11 @@ import {
   SLACK_CHANNELS_GATEWAY,
   type SlackChannelsGateway,
 } from '@/channels/domain/gateways/slack-channels.gateway';
+import { Conversation, ConversationRepository } from '@/conversations/domain';
+import {
+  SLACK_CONVERSATIONS_GATEWAY,
+  type SlackConversationsGateway,
+} from '@/conversations/domain/gateways/slack-conversations.gateway';
 import { User, UserRepository } from '@/users/domain';
 
 export class ProvisionAccountFromSlackCommand {
@@ -37,10 +42,13 @@ export class ProvisionAccountFromSlackHandler extends BaseCommandHandler<Provisi
     private readonly memberRepository: MemberRepository,
     private readonly userRepository: UserRepository,
     private readonly channelRepository: ChannelRepository,
+    private readonly conversationRepository: ConversationRepository,
     @Inject(SLACK_USERS_GATEWAY)
     private readonly slackUsersGateway: SlackUsersGateway,
     @Inject(SLACK_CHANNELS_GATEWAY)
     private readonly slackChannelsGateway: SlackChannelsGateway,
+    @Inject(SLACK_CONVERSATIONS_GATEWAY)
+    private readonly slackConversationsGateway: SlackConversationsGateway,
   ) {
     super();
   }
@@ -53,6 +61,8 @@ export class ProvisionAccountFromSlackHandler extends BaseCommandHandler<Provisi
     await this.importUsers({ account, botToken, installerSlackUserId });
 
     await this.importChannels({ account, botToken });
+
+    await this.importConversations({ account, botToken });
   }
 
   private async findOrCreateAccount({
@@ -185,6 +195,56 @@ export class ProvisionAccountFromSlackHandler extends BaseCommandHandler<Provisi
       });
       await this.channelRepository.save(channel);
     }
+  }
+
+  private async importConversations({
+    account,
+    botToken,
+  }: {
+    account: Account;
+    botToken: string;
+  }): Promise<void> {
+    const slackConversations =
+      await this.slackConversationsGateway.listUserConversations(botToken);
+
+    this.logger.log(slackConversations);
+
+    for (const sc of slackConversations) {
+      const resolvedMemberIds = await this.resolveMembers(sc.memberSlackIds);
+      if (!resolvedMemberIds) continue;
+
+      const existing =
+        await this.conversationRepository.findBySlackConversationId({
+          accountId: account.getId(),
+          slackConversationId: sc.slackConversationId,
+        });
+
+      if (existing) {
+        existing.update({ memberIds: resolvedMemberIds });
+        await this.conversationRepository.save(existing);
+        continue;
+      }
+
+      const conversation = Conversation.create({
+        accountId: account.getId(),
+        slackConversationId: sc.slackConversationId,
+        memberIds: resolvedMemberIds,
+        isGroupDm: sc.isGroupDm,
+      });
+      await this.conversationRepository.save(conversation);
+    }
+  }
+
+  private async resolveMembers(
+    memberSlackIds: string[],
+  ): Promise<string[] | null> {
+    const ids: string[] = [];
+    for (const slackUserId of memberSlackIds) {
+      const user = await this.userRepository.findBySlackId(slackUserId);
+      if (!user) return null;
+      ids.push(user.getId());
+    }
+    return ids;
   }
 
   private async findOrCreateUser(slackUser: {

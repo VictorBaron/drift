@@ -5,6 +5,9 @@ import { AuthModule } from 'auth/auth.module';
 import { ChannelsModule } from '@/channels/channels.module';
 import { SLACK_CHANNELS_GATEWAY } from '@/channels/domain/gateways/slack-channels.gateway';
 import { WebApiSlackChannelsGateway } from '@/channels/infrastructure/gateways/web-api-slack-channels.gateway';
+import { ConversationsModule } from '@/conversations/conversations.module';
+import { SLACK_CONVERSATIONS_GATEWAY } from '@/conversations/domain/gateways/slack-conversations.gateway';
+import { WebApiSlackConversationsGateway } from '@/conversations/infrastructure/gateways/web-api-slack-conversations.gateway';
 import { UserPersistenceModule } from '@/users/infrastructure';
 import { AccountsController } from './accounts.controller';
 import {
@@ -36,6 +39,7 @@ import { InvitationsController, MembersController } from './members.controller';
     AccountPersistenceModule.use('orm'),
     UserPersistenceModule.use('orm'),
     ChannelsModule,
+    ConversationsModule,
   ],
   controllers: [AccountsController, MembersController, InvitationsController],
   providers: [
@@ -50,6 +54,10 @@ import { InvitationsController, MembersController } from './members.controller';
     ProvisionAccountFromSlackHandler,
     { provide: SLACK_USERS_GATEWAY, useClass: WebApiSlackUsersGateway },
     { provide: SLACK_CHANNELS_GATEWAY, useClass: WebApiSlackChannelsGateway },
+    {
+      provide: SLACK_CONVERSATIONS_GATEWAY,
+      useClass: WebApiSlackConversationsGateway,
+    },
     GetAccountByIdHandler,
     GetUserAccountsHandler,
     GetAccountMembersHandler,
