@@ -17,6 +17,8 @@ const SLACK_SCOPES = [
   'reactions:read',
   'channels:read',
   'groups:read',
+  'im:read',
+  'mpim:read',
 ] as const;
 
 const USER_SCOPES = [

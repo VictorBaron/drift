@@ -1,3 +1,4 @@
+import type { Collection } from '@mikro-orm/core';
 import type { PersistenceEntity } from 'common/persistence-entity';
 
 type IfEquals<X, Y, A = X, B = never> =
@@ -20,6 +21,12 @@ type RelationKeys<T extends PersistenceEntity> = {
     : never;
 }[keyof T];
 
+type CollectionKeys<T> = {
+  [K in keyof T]: NonNullable<T[K]> extends Collection<PersistenceEntity>
+    ? K
+    : never;
+}[keyof T];
+
 export type OwnProperties<E extends PersistenceEntity> = Omit<
   E,
   RelationKeys<E> | keyof PersistenceEntity | ReadonlyKeys<E>
@@ -35,5 +42,5 @@ export type OwnPersistenceEntityProperties<E extends PersistenceEntity> =
 
 export type Properties<E extends PersistenceEntity> = Omit<
   E,
-  keyof PersistenceEntity | ReadonlyKeys<E>
+  keyof PersistenceEntity | ReadonlyKeys<E> | CollectionKeys<E>
 >;

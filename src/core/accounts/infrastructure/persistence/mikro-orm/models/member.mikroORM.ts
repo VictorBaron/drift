@@ -1,8 +1,17 @@
-import { Entity, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  Index,
+  ManyToMany,
+  ManyToOne,
+  Property,
+  Unique,
+} from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
 
 import type { MemberRoleLevel } from '@/accounts/domain';
+import { ConversationMikroOrm } from '@/conversations/infrastructure/persistence/mikro-orm';
 import { UserMikroOrm } from '@/users/infrastructure/persistence/mikro-orm';
 import { AccountMikroOrm } from './account.mikroORM';
 
@@ -37,6 +46,12 @@ export class MemberMikroOrm extends PersistenceEntity {
 
   @Property({ type: 'jsonb' })
   preferences: Record<string, unknown>;
+
+  @ManyToMany(
+    () => ConversationMikroOrm,
+    (conversation) => conversation.members,
+  )
+  conversations = new Collection<ConversationMikroOrm>(this);
 
   static build(
     props: OwnPersistenceEntityProperties<MemberMikroOrm>,

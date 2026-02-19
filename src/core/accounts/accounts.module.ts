@@ -27,6 +27,11 @@ import {
   GetPendingInvitationsHandler,
   GetUserAccountsHandler,
 } from './application/queries';
+import {
+  SlackChannelsImportService,
+  SlackConversationsImportService,
+  SlackUsersImportService,
+} from './application/services';
 import { SLACK_USERS_GATEWAY } from './domain/gateways/slack-users.gateway';
 import { WebApiSlackUsersGateway } from './infrastructure/gateways/web-api-slack-users.gateway';
 import { AccountPersistenceModule } from './infrastructure/persistence/account-persistence.module';
@@ -52,6 +57,9 @@ import { InvitationsController, MembersController } from './members.controller';
     EnableMemberHandler,
     ChangeMemberRoleHandler,
     ProvisionAccountFromSlackHandler,
+    SlackUsersImportService,
+    SlackChannelsImportService,
+    SlackConversationsImportService,
     { provide: SLACK_USERS_GATEWAY, useClass: WebApiSlackUsersGateway },
     { provide: SLACK_CHANNELS_GATEWAY, useClass: WebApiSlackChannelsGateway },
     {

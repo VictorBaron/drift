@@ -1,7 +1,17 @@
-import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  Property,
+  Unique,
+} from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
-import { AccountMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
+import {
+  AccountMikroOrm,
+  MemberMikroOrm,
+} from '@/accounts/infrastructure/persistence/mikro-orm';
 
 @Entity({ tableName: 'conversation' })
 @Unique({ properties: ['account', 'slackConversationId'] })
@@ -12,14 +22,16 @@ export class ConversationMikroOrm extends PersistenceEntity {
   @Property({ type: 'varchar', length: 255 })
   slackConversationId: string;
 
-  @Property({ type: 'jsonb' })
-  memberIds: string[];
+  @ManyToMany(() => MemberMikroOrm, 'conversations', { owner: true })
+  members = new Collection<MemberMikroOrm>(this);
 
   @Property({ type: 'boolean', default: false })
   isGroupDm: boolean;
 
   static build(
-    props: OwnPersistenceEntityProperties<ConversationMikroOrm>,
+    props: OwnPersistenceEntityProperties<ConversationMikroOrm> & {
+      members: ConversationMikroOrm['members'];
+    },
   ): ConversationMikroOrm {
     return Object.assign(new ConversationMikroOrm(), props);
   }
