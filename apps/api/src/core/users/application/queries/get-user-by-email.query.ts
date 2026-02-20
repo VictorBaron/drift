@@ -1,0 +1,16 @@
+import { Injectable } from '@nestjs/common';
+
+import { User, UserRepository } from '@/users/domain';
+
+export class GetUserByEmailQuery {
+  constructor(readonly email: string) {}
+}
+
+@Injectable()
+export class GetUserByEmail {
+  constructor(private readonly repository: UserRepository) {}
+
+  async execute(query: GetUserByEmailQuery): Promise<User | null> {
+    return this.repository.findByEmail(query.email);
+  }
+}

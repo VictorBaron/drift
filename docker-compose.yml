@@ -2,20 +2,21 @@ services:
   app:
     build:
       context: .
+      dockerfile: apps/api/Dockerfile
       target: dev
     container_name: shoulder-tap-app
     restart: unless-stopped
     ports:
       - '3000:3000'
     env_file:
-      - .env
+      - apps/api/.env
     environment:
       DATABASE_URL: postgresql://shouldertap:shouldertap@postgres:5432/shouldertap
     volumes:
-      - ./src:/app/src
-      - ./nest-cli.json:/app/nest-cli.json
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./tsconfig.build.json:/app/tsconfig.build.json
+      - ./apps/api/src:/app/apps/api/src
+      - ./apps/api/nest-cli.json:/app/apps/api/nest-cli.json
+      - ./apps/api/tsconfig.json:/app/apps/api/tsconfig.json
+      - ./apps/api/tsconfig.build.json:/app/apps/api/tsconfig.build.json
     depends_on:
       postgres:
         condition: service_healthy

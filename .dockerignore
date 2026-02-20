@@ -1,8 +1,9 @@
-node_modules
-dist
+**/node_modules
+**/dist
 .git
 *.md
-.env*.local
-coverage
+**/.env*.local
+**/coverage
 .idea
 .vscode
+apps/electron
