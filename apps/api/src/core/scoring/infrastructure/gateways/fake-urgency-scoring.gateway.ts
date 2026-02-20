@@ -2,40 +2,52 @@ import { randomInt } from 'crypto';
 import type { UrgencyScoringGateway, UrgencyScoringInput, UrgencyScoringResult } from '@/scoring/domain/gateways';
 
 export class FakeUrgencyScoringGateway implements UrgencyScoringGateway {
+  private fixedScore = 3;
+  private fixedReasoning = 'Controlled reasoning';
   private lastInput: UrgencyScoringInput | null = null;
 
-  async scoreMessage(input: UrgencyScoringInput): Promise<UrgencyScoringResult> {
-    this.lastInput = input;
+  setScore(score: number, reasoning = 'Controlled reasoning'): void {
+    this.fixedScore = score;
+    this.fixedReasoning = reasoning;
+  }
 
-    const fakeScores: UrgencyScoringResult[] = [
+  async scoreMessage(input: UrgencyScoringInput, random = false): Promise<UrgencyScoringResult> {
+    this.lastInput = input;
+    if (random) return this.scoreMessageAtRandom(input);
+
+    return { score: this.fixedScore, reasoning: this.fixedReasoning, confidenceScore: 0.8 };
+  }
+
+  private async scoreMessageAtRandom(input: UrgencyScoringInput): Promise<UrgencyScoringResult> {
+    const fakeMessageAnalysis: UrgencyScoringResult[] = [
       {
         score: 1,
         reasoning: 'Noise',
-        confidenceScore: 100,
+        confidenceScore: 0.8,
       },
       {
         score: 2,
         reasoning: 'FYI New customer signed (Google)',
-        confidenceScore: 100,
+        confidenceScore: 0.8,
       },
       {
         score: 3,
         reasoning: "Your boss asked you how it's going",
-        confidenceScore: 100,
+        confidenceScore: 0.8,
       },
       {
         score: 4,
         reasoning: 'Michel needs help for his feature',
-        confidenceScore: 100,
+        confidenceScore: 0.8,
       },
       {
         score: 5,
         reasoning: 'Prod is down',
-        confidenceScore: 100,
+        confidenceScore: 0.8,
       },
     ];
-    const randomScore = fakeScores[randomInt(5)];
-    return randomScore;
+
+    return fakeMessageAnalysis[randomInt(5)];
   }
 
   getLastInput(): UrgencyScoringInput {

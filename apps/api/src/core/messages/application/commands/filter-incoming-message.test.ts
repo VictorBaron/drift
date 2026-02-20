@@ -18,6 +18,8 @@ import {
   MessageRepository,
   MessageScoredEvent,
 } from '@/messages/domain';
+import { URGENT_NOTIFICATION_GATEWAY } from '@/messages/domain/gateways/urgent-notification.gateway';
+import { FakeUrgentNotificationGateway } from '@/messages/infrastructure/gateways/fake-urgent-notification.gateway';
 import { MessageRepositoryInMemory } from '@/messages/infrastructure/persistence/in-memory/message.repository.in-memory';
 import { URGENCY_SCORING_GATEWAY } from '@/scoring/domain/gateways';
 import { FakeUrgencyScoringGateway } from '@/scoring/infrastructure/gateways';
@@ -63,6 +65,10 @@ describe('Filter incoming message', () => {
         {
           provide: URGENCY_SCORING_GATEWAY,
           useClass: FakeUrgencyScoringGateway,
+        },
+        {
+          provide: URGENT_NOTIFICATION_GATEWAY,
+          useClass: FakeUrgentNotificationGateway,
         },
       ],
     }).compile();
@@ -274,6 +280,98 @@ describe('Filter incoming message', () => {
       const lastInput = scoringGateway.getLastInput();
       expect(lastInput.recipients).toHaveLength(1);
       expect(lastInput.recipients[0].getId()).toBe('recipient1Id');
+    });
+  });
+
+  describe('urgent notification', () => {
+    let notificationGateway: FakeUrgentNotificationGateway;
+    let urgencyScoringGateway: FakeUrgencyScoringGateway;
+
+    beforeEach(async () => {
+      notificationGateway = new FakeUrgentNotificationGateway();
+
+      const module = await Test.createTestingModule({
+        providers: [
+          FilterIncomingMessage,
+          { provide: MessageRepository, useClass: MessageRepositoryInMemory },
+          { provide: AccountRepository, useClass: AccountRepositoryInMemory },
+          { provide: MemberRepository, useClass: MemberRepositoryInMemory },
+          { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
+          { provide: ConversationRepository, useClass: ConversationRepositoryInMemory },
+          { provide: URGENCY_SCORING_GATEWAY, useClass: FakeUrgencyScoringGateway },
+          { provide: URGENT_NOTIFICATION_GATEWAY, useValue: notificationGateway },
+        ],
+      }).compile();
+
+      const localHandler = module.get(FilterIncomingMessage);
+      const localMessageRepo = module.get<MessageRepositoryInMemory>(MessageRepository);
+      const localAccountRepo = module.get<AccountRepositoryInMemory>(AccountRepository);
+      const localMemberRepo = module.get<MemberRepositoryInMemory>(MemberRepository);
+      urgencyScoringGateway = module.get<FakeUrgencyScoringGateway>(URGENCY_SCORING_GATEWAY);
+
+      localMessageRepo.clear();
+      localAccountRepo.clear();
+      localMemberRepo.clear();
+
+      await localAccountRepo.save(AccountFactory.create({ id: 'accountId', slackTeamId: 'teamId' }));
+      await localMemberRepo.save(
+        MemberFactory.create({
+          id: 'senderId',
+          accountId: 'accountId',
+          user: UserFactory.create({ id: 'senderUserId', slackId: 'slackUserId' }),
+        }),
+      );
+
+      handler = localHandler;
+      messageRepository = localMessageRepo;
+    });
+
+    it('should call the urgent notification gateway when message scores 5', async () => {
+      urgencyScoringGateway.setScore(5, 'Prod is down');
+
+      const command = new FilterIncomingMessageCommand({
+        messageEvent: createGenericMessageEvent({ text: 'Production is down!' }),
+      });
+
+      const result = await handler.execute(command);
+
+      expect(notificationGateway.getCallCount()).toBe(1);
+
+      const saved = await messageRepository.findById(result!.id);
+      expect(saved?.toJSON()).toMatchObject<Partial<MessageJSON>>({
+        urgencyScore: 5,
+        urgencyReasoning: 'Prod is down',
+      });
+    });
+
+    it('should include the message text, id, score, and reasoning in the notification payload', async () => {
+      urgencyScoringGateway.setScore(5, 'Prod is down');
+
+      const command = new FilterIncomingMessageCommand({
+        messageEvent: createGenericMessageEvent({ text: 'Production is down!' }),
+      });
+
+      const result = await handler.execute(command);
+      const payload = notificationGateway.getLastPayload();
+
+      expect(payload).toEqual({
+        messageId: result!.id,
+        text: 'Production is down!',
+        score: 5,
+        reasoning: 'Prod is down',
+      });
+    });
+
+    it('should NOT call the urgent notification gateway when message scores less than 5', async () => {
+      urgencyScoringGateway.setScore(4, 'Important but not critical');
+
+      const command = new FilterIncomingMessageCommand({
+        messageEvent: createGenericMessageEvent({ text: 'Hey, can you check this?' }),
+      });
+
+      await handler.execute(command);
+
+      expect(notificationGateway.getCallCount()).toBe(0);
     });
   });
 });

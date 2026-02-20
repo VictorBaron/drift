@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-
+import { SlackChannelsImportService, SlackConversationsImportService, SlackUsersImportService } from '@/accounts';
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
 import { SLACK_USERS_GATEWAY, type SlackUserInfo } from '@/accounts/domain/gateways/slack-users.gateway';
@@ -21,7 +21,6 @@ import { ConversationRepositoryInMemory } from '@/conversations/infrastructure/p
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { Email, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
-
 import { ProvisionAccountFromSlack, ProvisionAccountFromSlackCommand } from './provision-account-from-slack';
 
 const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
@@ -54,20 +53,17 @@ describe('Provision Account From Slack — Conversation Import', () => {
     const module = await Test.createTestingModule({
       providers: [
         ProvisionAccountFromSlack,
+        SlackUsersImportService,
+        SlackChannelsImportService,
+        SlackConversationsImportService,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
-        { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
         { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
+        { provide: ConversationRepository, useClass: ConversationRepositoryInMemory },
+        { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
         { provide: SLACK_CHANNELS_GATEWAY, useClass: FakeSlackChannelsGateway },
-        {
-          provide: ConversationRepository,
-          useClass: ConversationRepositoryInMemory,
-        },
-        {
-          provide: SLACK_CONVERSATIONS_GATEWAY,
-          useClass: FakeSlackConversationsGateway,
-        },
+        { provide: SLACK_CONVERSATIONS_GATEWAY, useClass: FakeSlackConversationsGateway },
       ],
     }).compile();
 
@@ -180,12 +176,18 @@ describe('Provision Account From Slack — Conversation Import', () => {
       const conversations = await conversationRepository.findByAccountId(account!.getId());
 
       const json = conversations[0].toJSON();
-      const installerUser = await userRepository.findBySlackId('U_INSTALLER');
-      const otherUser = await userRepository.findBySlackId('U_OTHER');
+      const installerMember = await memberRepository.findByAccountIdAndSlackUserId({
+        accountId: account!.getId(),
+        slackUserId: 'U_INSTALLER',
+      });
+      const otherMember = await memberRepository.findByAccountIdAndSlackUserId({
+        accountId: account!.getId(),
+        slackUserId: 'U_OTHER',
+      });
 
       expect(json.memberIds).toHaveLength(2);
-      expect(json.memberIds).toContain(installerUser!.getId());
-      expect(json.memberIds).toContain(otherUser!.getId());
+      expect(json.memberIds).toContain(installerMember!.getId());
+      expect(json.memberIds).toContain(otherMember!.getId());
     });
 
     it('should store the correct conversation properties', async () => {
@@ -212,7 +214,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
   });
 
   describe('when some members are not in the system', () => {
-    it('should skip conversations where not all members are resolved', async () => {
+    it('should create the conversation but skip these members', async () => {
       slackConversationsGateway.setConversations([
         makeSlackConversation({
           slackConversationId: 'D_UNKNOWN',
@@ -229,7 +231,7 @@ describe('Provision Account From Slack — Conversation Import', () => {
       const account = await accountRepository.findBySlackTeamId('T_ACME');
       const conversations = await conversationRepository.findByAccountId(account!.getId());
 
-      expect(conversations).toHaveLength(0);
+      expect(conversations).toHaveLength(1);
     });
   });
 

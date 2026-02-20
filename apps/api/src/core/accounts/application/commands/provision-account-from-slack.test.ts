@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-
+import { SlackChannelsImportService, SlackConversationsImportService, SlackUsersImportService } from '@/accounts';
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
@@ -12,9 +12,12 @@ import { ChannelRepository } from '@/channels/domain';
 import { SLACK_CHANNELS_GATEWAY } from '@/channels/domain/gateways/slack-channels.gateway';
 import { FakeSlackChannelsGateway } from '@/channels/infrastructure/gateways/fake-slack-channels.gateway';
 import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence/in-memory/channel.repository.in-memory';
+import { ConversationRepository } from '@/conversations';
+import { SLACK_CONVERSATIONS_GATEWAY } from '@/conversations/domain/gateways/slack-conversations.gateway';
+import { FakeSlackConversationsGateway } from '@/conversations/infrastructure/gateways/fake-slack-conversations.gateway';
+import { ConversationRepositoryInMemory } from '@/conversations/infrastructure/persistence/in-memory/conversation.repository.in-memory';
 import { User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
-
 import { ProvisionAccountFromSlack, ProvisionAccountFromSlackCommand } from './provision-account-from-slack';
 
 const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
@@ -37,12 +40,17 @@ describe('Provision Account From Slack', () => {
     const module = await Test.createTestingModule({
       providers: [
         ProvisionAccountFromSlack,
+        SlackUsersImportService,
+        SlackChannelsImportService,
+        SlackConversationsImportService,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
         { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
+        { provide: ConversationRepository, useClass: ConversationRepositoryInMemory },
         { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
         { provide: SLACK_CHANNELS_GATEWAY, useClass: FakeSlackChannelsGateway },
+        { provide: SLACK_CONVERSATIONS_GATEWAY, useClass: FakeSlackConversationsGateway },
       ],
     }).compile();
 

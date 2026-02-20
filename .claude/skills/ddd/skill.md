@@ -329,7 +329,7 @@ export class CreateOrderCommand {
 @Injectable()
 export class CreateOrder {
   constructor(
-    @Inject(ORDER_REPOSITORY) private readonly orderRepo: OrderRepository
+    private readonly orderRepo: OrderRepository
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<string> {

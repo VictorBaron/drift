@@ -60,6 +60,10 @@ export class Message extends AggregateRoot {
     return new Message(props);
   }
 
+  isUrgent(): boolean {
+    return this.urgencyScore === 5;
+  }
+
   setUrgencyScore({ score, reasoning }: { score: number; reasoning: string }): void {
     this.urgencyScore = score;
     this.urgencyReasoning = reasoning;

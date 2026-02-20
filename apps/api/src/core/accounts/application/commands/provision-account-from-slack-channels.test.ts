@@ -11,6 +11,10 @@ import { ChannelRepository } from '@/channels/domain';
 import { SLACK_CHANNELS_GATEWAY, type SlackChannelInfo } from '@/channels/domain/gateways/slack-channels.gateway';
 import { FakeSlackChannelsGateway } from '@/channels/infrastructure/gateways/fake-slack-channels.gateway';
 import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence/in-memory/channel.repository.in-memory';
+import { ConversationRepository } from '@/conversations';
+import { SLACK_CONVERSATIONS_GATEWAY } from '@/conversations/domain/gateways/slack-conversations.gateway';
+import { FakeSlackConversationsGateway } from '@/conversations/infrastructure/gateways/fake-slack-conversations.gateway';
+import { ConversationRepositoryInMemory } from '@/conversations/infrastructure/persistence/in-memory/conversation.repository.in-memory';
 import { UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 import { ProvisionAccountFromSlack, ProvisionAccountFromSlackCommand } from './provision-account-from-slack';
@@ -55,12 +59,11 @@ describe('Provision Account From Slack — Channel Import', () => {
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
-        { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
         { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
-        {
-          provide: SLACK_CHANNELS_GATEWAY,
-          useClass: FakeSlackChannelsGateway,
-        },
+        { provide: ConversationRepository, useClass: ConversationRepositoryInMemory },
+        { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
+        { provide: SLACK_CHANNELS_GATEWAY, useClass: FakeSlackChannelsGateway },
+        { provide: SLACK_CONVERSATIONS_GATEWAY, useClass: FakeSlackConversationsGateway },
       ],
     }).compile();
 
@@ -113,7 +116,6 @@ describe('Provision Account From Slack — Channel Import', () => {
           purpose: 'General announcements',
           isPrivate: false,
           isArchived: false,
-          memberCount: 42,
         }),
       ]);
 
@@ -137,7 +139,6 @@ describe('Provision Account From Slack — Channel Import', () => {
         purpose: 'General announcements',
         isPrivate: false,
         isArchived: false,
-        memberCount: 42,
       });
     });
 
@@ -240,7 +241,6 @@ describe('Provision Account From Slack — Channel Import', () => {
         name: 'general-renamed',
         topic: 'New topic',
         purpose: 'New purpose',
-        memberCount: 20,
         isArchived: true,
       });
     });
@@ -339,7 +339,6 @@ describe('Provision Account From Slack — Channel Import', () => {
         name: 'new-channel',
         topic: 'Fresh channel',
         purpose: 'A brand new channel',
-        memberCount: 3,
       });
     });
   });

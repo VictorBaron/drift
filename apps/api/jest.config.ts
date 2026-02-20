@@ -4,7 +4,9 @@ export default {
   roots: ['<rootDir>/src'],
   testMatch: ['**/*.test.ts'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@/(.*)$': '<rootDir>/src/core/$1',
+    '^common/(.*)$': '<rootDir>/src/common/$1',
+    '^auth/(.*)$': '<rootDir>/src/auth/$1',
   },
   transform: {
     '^.+\\.ts$': [

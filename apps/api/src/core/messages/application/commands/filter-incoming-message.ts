@@ -5,7 +5,12 @@ import { BaseCommand } from 'common/application/command-handler';
 import { AccountRepository, Member, MemberRepository } from '@/accounts';
 import { ChannelRepository } from '@/channels/domain';
 import { ConversationRepository } from '@/conversations/domain';
-import { Message, MessageRepository } from '@/messages/domain';
+import {
+  Message,
+  MessageRepository,
+  URGENT_NOTIFICATION_GATEWAY,
+  type UrgentNotificationGateway,
+} from '@/messages/domain';
 import { URGENCY_SCORING_GATEWAY, type UrgencyScoringGateway } from '@/scoring/domain/gateways';
 
 export class FilterIncomingMessageCommand {
@@ -19,18 +24,15 @@ export class FilterIncomingMessageCommand {
 @CommandHandler(FilterIncomingMessageCommand)
 export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageCommand> {
   constructor(
-    @Inject(MessageRepository)
     private readonly messageRepository: MessageRepository,
-    @Inject(AccountRepository)
     private accountRepository: AccountRepository,
-    @Inject(MemberRepository)
     private memberRepository: MemberRepository,
-    @Inject(ChannelRepository)
     private channelRepository: ChannelRepository,
-    @Inject(ConversationRepository)
     private conversationRepository: ConversationRepository,
     @Inject(URGENCY_SCORING_GATEWAY)
     private scoringGateway: UrgencyScoringGateway,
+    @Inject(URGENT_NOTIFICATION_GATEWAY)
+    private notificationGateway: UrgentNotificationGateway,
   ) {
     super();
   }
@@ -73,6 +75,15 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
     message.setUrgencyScore({ score, reasoning });
 
     await this.messageRepository.save(message);
+
+    if (message.isUrgent()) {
+      await this.notificationGateway.notifyUrgentMessage({
+        messageId: message.id,
+        text: messageEvent.text,
+        score,
+        reasoning,
+      });
+    }
 
     return message;
   }
