@@ -8,8 +8,11 @@ This Electron app is the desktop client for ShoulderTap. It connects to the Nest
 
 ```
 apps/electron/
-  main.js       # Main process — app lifecycle, BrowserWindow, SSE connection
-  index.html    # Renderer entry point (loaded into BrowserWindow)
+  src/
+    main.ts       # Main process — app lifecycle, BrowserWindow, SSE connection
+  index.html      # Renderer entry point (loaded into BrowserWindow)
+  tsconfig.json   # TypeScript configuration
+  dist/           # Compiled output (git-ignored)
 ```
 
 ## Architecture Rules
@@ -18,7 +21,7 @@ apps/electron/
 
 Electron has two processes — follow their boundaries strictly:
 
-- **Main process** (`main.js`): Node.js environment. Handles app lifecycle, native APIs (Notifications, Tray, Menu), IPC, and all communication with the API. Never put business logic in the renderer.
+- **Main process** (`src/main.ts`): Node.js environment. Handles app lifecycle, native APIs (Notifications, Tray, Menu), IPC, and all communication with the API. Never put business logic in the renderer.
 - **Renderer process** (`index.html` + any JS loaded from it): Browser environment. UI only. No direct Node.js or Electron API access — communicate with the main process via `ipcRenderer`/`ipcMain`.
 
 ### Security Rules (mandatory)
@@ -47,12 +50,19 @@ Electron has two processes — follow their boundaries strictly:
 # Install dependencies
 pnpm install
 
+# Build TypeScript
+pnpm build
+
 # Launch the app
 pnpm start
+
+# Build and launch (dev)
+pnpm dev
 ```
 
 ## Code Style
 
-- CommonJS (`require`/`module.exports`) — the package is `"type": "commonjs"`
-- Keep `main.js` focused on wiring; extract helpers into separate files as complexity grows
+- TypeScript with strict mode enabled
+- ES module imports (`import`/`export`), compiled to CommonJS for Electron main process
+- Keep `src/main.ts` focused on wiring; extract helpers into separate files as complexity grows
 - Prefer named constants over magic strings/numbers (e.g., `RECONNECT_DELAY_MS = 5000`)

@@ -77,6 +77,7 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
     await this.messageRepository.save(message);
 
     if (message.isUrgent()) {
+      this.logger.log('🚨 URGENT MESSAGE 🚨');
       await this.notificationGateway.notifyUrgentMessage({
         messageId: message.id,
         text: messageEvent.text,

@@ -5,13 +5,16 @@
   "license": "MIT",
   "author": "Victor Baron",
   "type": "commonjs",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "dev": "electron .",
-    "start": "electron .",
+    "dev": "tsc && electron dist/main.js",
+    "build": "tsc",
+    "start": "electron dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "electron": "^40.6.0"
+    "@types/node": "^22.13.0",
+    "electron": "^40.6.0",
+    "typescript": "~5.7.3"
   }
 }

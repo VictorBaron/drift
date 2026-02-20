@@ -61,7 +61,11 @@ export class Message extends AggregateRoot {
   }
 
   isUrgent(): boolean {
-    return this.urgencyScore === 5;
+    return this.urgencyScore === 5 || this.isUrgentTest();
+  }
+
+  isUrgentTest(): boolean {
+    return this.text === 'Test Prod down';
   }
 
   setUrgencyScore({ score, reasoning }: { score: number; reasoning: string }): void {

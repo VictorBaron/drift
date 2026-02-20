@@ -13,7 +13,7 @@ export class FakeUrgencyScoringGateway implements UrgencyScoringGateway {
 
   async scoreMessage(input: UrgencyScoringInput, random = false): Promise<UrgencyScoringResult> {
     this.lastInput = input;
-    if (random) return this.scoreMessageAtRandom(input);
+    if (random || !this.fixedScore) return this.scoreMessageAtRandom(input);
 
     return { score: this.fixedScore, reasoning: this.fixedReasoning, confidenceScore: 0.8 };
   }

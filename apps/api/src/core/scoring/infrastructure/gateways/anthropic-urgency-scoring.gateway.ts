@@ -18,6 +18,10 @@ export class AnthropicUrgencyScoringGateway implements UrgencyScoringGateway {
     this.client = new Anthropic();
   }
 
+  setScore(): void {
+    throw new Error('Cannot set score on Anthropic Urgency Scoring');
+  }
+
   async scoreMessage(input: UrgencyScoringInput): Promise<UrgencyScoringResult> {
     const response = await this.client.messages.create({
       model: AnthropicModel.HAIKU,

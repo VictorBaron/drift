@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "docker compose -f ../../docker-compose.yml up --build",
     "build": "nest build",
     "lint": "biome check --write \"src/**/*.ts\"",
     "format": "biome check --write \"src/**/*.ts\"",

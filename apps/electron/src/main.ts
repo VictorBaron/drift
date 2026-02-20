@@ -1,22 +1,24 @@
-const { app, BrowserWindow, Notification } = require('electron/main');
-const http = require('http');
+import http from 'node:http';
+import path from 'node:path';
+import { app, BrowserWindow, Notification } from 'electron';
 
 const API_URL = 'http://localhost:3000';
+const RECONNECT_DELAY_MS = 5000;
 
-const createWindow = () => {
+function createWindow(): void {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
   });
 
-  win.loadFile('index.html');
-};
+  win.loadFile(path.join(__dirname, '..', 'index.html'));
+}
 
-function connectToNotificationStream() {
+function connectToNotificationStream(): void {
   const req = http.get(`${API_URL}/notifications/stream`, (res) => {
     let buffer = '';
 
-    res.on('data', (chunk) => {
+    res.on('data', (chunk: Buffer) => {
       buffer += chunk.toString();
       const lines = buffer.split('\n');
       buffer = lines.pop() ?? '';
@@ -24,10 +26,11 @@ function connectToNotificationStream() {
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         try {
-          const payload = JSON.parse(line.slice(6));
+          const payload = JSON.parse(line.slice(6)) as { text?: string };
           new Notification({
             title: 'Urgent Slack message',
             body: payload.text ?? 'You have an urgent message',
+            timeoutType: 'never',
           }).show();
         } catch {
           // ignore malformed SSE data
@@ -36,12 +39,12 @@ function connectToNotificationStream() {
     });
 
     res.on('end', () => {
-      setTimeout(connectToNotificationStream, 5000);
+      setTimeout(connectToNotificationStream, RECONNECT_DELAY_MS);
     });
   });
 
   req.on('error', () => {
-    setTimeout(connectToNotificationStream, 5000);
+    setTimeout(connectToNotificationStream, RECONNECT_DELAY_MS);
   });
 }
 

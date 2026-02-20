@@ -15,4 +15,5 @@ export interface UrgencyScoringResult {
 
 export interface UrgencyScoringGateway {
   scoreMessage(input: UrgencyScoringInput): Promise<UrgencyScoringResult>;
+  setScore(score: number, reasoning?: string): void;
 }
