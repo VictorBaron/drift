@@ -85,6 +85,8 @@
     "typescript-eslint": "^8.55.0"
   },
   "lint-staged": {
-    "*.ts": ["biome check --write --no-errors-on-unmatched"]
+    "*.ts": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   }
 }

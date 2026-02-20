@@ -241,8 +241,17 @@ export class Member extends AggregateRoot {
   getAccountId(): string {
     return this.accountId;
   }
+
   getUserId(): string {
     return this.user.getId();
+  }
+
+  getName(): string | null {
+    return this.user.getName();
+  }
+
+  getEmail(): string {
+    return this.user.getEmail();
   }
 
   identify({ accountId, slackUserId }: { accountId: string; slackUserId: string }) {

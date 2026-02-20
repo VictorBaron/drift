@@ -1,7 +1,22 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+export interface NotificationPayload {
+  text: string;
+  reasoning: string;
+  sender: { name: string | null; email: string };
+  channel: { name: string | null; type: string };
+  slackLink: string;
+}
+
 contextBridge.exposeInMainWorld('electronAPI', {
-  onNotification: (callback: (payload: { text: string }) => void) => {
-    ipcRenderer.on('notification', (_event, payload) => callback(payload as { text: string }));
+  onNotification: (callback: (payload: NotificationPayload) => void) => {
+    ipcRenderer.on('notification', (_event, payload) => callback(payload as NotificationPayload));
   },
+});
+
+contextBridge.exposeInMainWorld('shouldertap', {
+  listInterrupts: () => ipcRenderer.invoke('interrupts:list'),
+  markRead: (id: string) => ipcRenderer.invoke('interrupts:markRead', { id }),
+  snooze: (id: string, minutes: number) => ipcRenderer.invoke('interrupts:snooze', { id, minutes }),
+  setFocus: (minutes: number) => ipcRenderer.invoke('focus:set', { minutes }),
 });

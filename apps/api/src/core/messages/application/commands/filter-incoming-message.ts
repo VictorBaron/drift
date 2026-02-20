@@ -47,12 +47,12 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
       return null;
     }
 
-    const sender = await this.getSender({
+    const { sender, account } = await this.getSender({
       team: messageEvent.team,
       user: messageEvent.user,
     });
 
-    const recipients = await this.getRecipients({
+    const { recipients, channelName } = await this.getRecipients({
       accountId: sender.getAccountId(),
       senderId: sender.getId(),
       slackChannelId: messageEvent.channel,
@@ -83,6 +83,15 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
         text: messageEvent.text,
         score,
         reasoning,
+        sender: {
+          name: sender.getName(),
+          email: sender.getEmail(),
+        },
+        channel: {
+          name: channelName,
+          type: messageEvent.channel_type,
+        },
+        slackLink: `slack://channel?team=${account.getSlackTeamId()}&id=${messageEvent.channel}`,
       });
     }
 
@@ -104,7 +113,7 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
     if (!sender) {
       throw new Error(`No user found for Slack user ${user}`);
     }
-    return sender;
+    return { sender, account };
   }
 
   private async getRecipients({
@@ -117,32 +126,34 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
     senderId: string;
     slackChannelId: string;
     channelType: GenericMessageEvent['channel_type'];
-  }): Promise<Member[]> {
+  }): Promise<{ recipients: Member[]; channelName: string | null }> {
     const isGroupOrChannel = (channelType: GenericMessageEvent['channel_type']) =>
       channelType === 'channel' || channelType === 'group';
 
-    const findMembersInConversation = async () => {
-      if (isGroupOrChannel(channelType)) {
-        const channel = await this.channelRepository.findBySlackChannelId({
-          accountId,
-          slackChannelId,
-        });
-        if (!channel) return [];
-
-        return this.memberRepository.findManyByIds(channel.getMemberIds());
-      }
-
-      const conversation = await this.conversationRepository.findBySlackConversationId({
+    if (isGroupOrChannel(channelType)) {
+      const channel = await this.channelRepository.findBySlackChannelId({
         accountId,
-        slackConversationId: slackChannelId,
+        slackChannelId,
       });
-      if (!conversation) return [];
+      if (!channel) return { recipients: [], channelName: null };
 
-      return this.memberRepository.findManyByIds(conversation.toJSON().memberIds);
+      const members = await this.memberRepository.findManyByIds(channel.getMemberIds());
+      return {
+        recipients: members.filter((m) => m.getId() !== senderId),
+        channelName: channel.getName(),
+      };
+    }
+
+    const conversation = await this.conversationRepository.findBySlackConversationId({
+      accountId,
+      slackConversationId: slackChannelId,
+    });
+    if (!conversation) return { recipients: [], channelName: null };
+
+    const members = await this.memberRepository.findManyByIds(conversation.toJSON().memberIds);
+    return {
+      recipients: members.filter((m) => m.getId() !== senderId),
+      channelName: null,
     };
-
-    const members = await findMembersInConversation();
-
-    return members.filter((m) => m.getId() !== senderId);
   }
 }

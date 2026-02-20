@@ -5,6 +5,15 @@ export interface UrgentNotificationPayload {
   text: string;
   score: number;
   reasoning: string;
+  sender: {
+    name: string | null;
+    email: string;
+  };
+  channel: {
+    name: string | null;
+    type: string;
+  };
+  slackLink: string;
 }
 
 export interface UrgentNotificationGateway {

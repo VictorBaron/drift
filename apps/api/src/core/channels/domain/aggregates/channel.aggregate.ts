@@ -76,6 +76,10 @@ export class Channel extends AggregateRoot {
     return this.memberIds;
   }
 
+  getName(): string {
+    return this.name;
+  }
+
   getId(): string {
     return this.id;
   }

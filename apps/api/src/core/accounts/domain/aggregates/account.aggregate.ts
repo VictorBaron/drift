@@ -54,6 +54,10 @@ export class Account extends AggregateRoot {
     return this.name;
   }
 
+  getSlackTeamId(): string {
+    return this.slackTeamId;
+  }
+
   get isActive(): boolean {
     return true;
   }
