@@ -5,13 +5,21 @@ import { app, BrowserWindow, Notification } from 'electron';
 const API_URL = 'http://localhost:3000';
 const RECONNECT_DELAY_MS = 5000;
 
+let mainWindow: BrowserWindow | null = null;
+
 function createWindow(): void {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
   });
 
-  win.loadFile(path.join(__dirname, '..', 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
 function connectToNotificationStream(): void {
@@ -32,6 +40,7 @@ function connectToNotificationStream(): void {
             body: payload.text ?? 'You have an urgent message',
             timeoutType: 'never',
           }).show();
+          mainWindow?.webContents.send('notification', payload);
         } catch {
           // ignore malformed SSE data
         }

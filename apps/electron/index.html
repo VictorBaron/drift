@@ -6,12 +6,27 @@
   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
   <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
-  <title>Hello from Electron renderer!</title>
+  <title>ShoulderTap</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 1rem; }
+    h1 { font-size: 1.2rem; margin-bottom: 1rem; }
+    #messages { list-style: none; padding: 0; margin: 0; }
+    #messages li {
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      background: #fff3cd;
+      border-left: 4px solid #f0ad4e;
+      border-radius: 4px;
+    }
+    #empty { color: #888; font-size: 0.9rem; }
+  </style>
 </head>
 
 <body>
-  <h1>Hello from Electron renderer!</h1>
-  <p>👋</p>
+  <h1>Urgent messages</h1>
+  <p id="empty">No urgent messages yet.</p>
+  <ul id="messages"></ul>
+  <script src="renderer.js"></script>
 </body>
 
 </html>
