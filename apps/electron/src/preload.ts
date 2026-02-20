@@ -9,8 +9,10 @@ export interface NotificationPayload {
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  onNotification: (callback: (payload: NotificationPayload) => void) => {
-    ipcRenderer.on('notification', (_event, payload) => callback(payload as NotificationPayload));
+  onNotification: (callback: (payload: NotificationPayload) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, payload: NotificationPayload) => callback(payload);
+    ipcRenderer.on('notification', handler);
+    return () => ipcRenderer.removeListener('notification', handler);
   },
 });
 
@@ -19,4 +21,5 @@ contextBridge.exposeInMainWorld('shouldertap', {
   markRead: (id: string) => ipcRenderer.invoke('interrupts:markRead', { id }),
   snooze: (id: string, minutes: number) => ipcRenderer.invoke('interrupts:snooze', { id, minutes }),
   setFocus: (minutes: number) => ipcRenderer.invoke('focus:set', { minutes }),
+  openSlackLink: (url: string) => ipcRenderer.invoke('open:slackLink', { url }),
 });
