@@ -39,6 +39,9 @@ export class MemberMikroOrm extends PersistenceEntity {
   @Property({ type: 'jsonb' })
   preferences: Record<string, unknown>;
 
+  @Property({ type: 'timestamptz', nullable: true })
+  focusEndsAt: Date | null;
+
   @ManyToMany(
     () => ConversationMikroOrm,
     (conversation) => conversation.members,

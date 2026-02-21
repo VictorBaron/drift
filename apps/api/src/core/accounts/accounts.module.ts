@@ -18,6 +18,7 @@ import {
   DisableMember,
   EnableMember,
   InviteMember,
+  StartFocusTime,
   UpdateAccount,
 } from './application/commands';
 import { ProvisionAccountFromSlack } from './application/commands/provision-account-from-slack';
@@ -51,6 +52,7 @@ import { InvitationsController, MembersController } from './members.controller';
     DisableMember,
     EnableMember,
     ChangeMemberRole,
+    StartFocusTime,
     ProvisionAccountFromSlack,
     SlackUsersImportService,
     SlackChannelsImportService,

@@ -1,6 +1,18 @@
 import { DomainEvent } from 'common/domain';
 import type { Member, MemberRoleLevel } from '@/accounts/domain';
 
+export class FocusTimeStartedEvent extends DomainEvent {
+  readonly eventName = 'member.focus_time_started';
+  readonly member: Member;
+  readonly endsAt: Date;
+
+  constructor({ member, endsAt }: { member: Member; endsAt: Date }) {
+    super();
+    this.member = member;
+    this.endsAt = endsAt;
+  }
+}
+
 export class MemberInvitedEvent extends DomainEvent {
   readonly eventName = 'member.invited';
   readonly actor: Member;

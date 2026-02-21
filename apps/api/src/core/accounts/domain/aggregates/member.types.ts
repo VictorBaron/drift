@@ -13,6 +13,7 @@ export interface MemberProps extends AggregateRootProps {
   invitedById: string | null;
   lastActiveAt: Date | null;
   preferences: MemberPreferences;
+  focusEndsAt: Date | null;
 }
 
 export interface CreateMemberProps {
@@ -36,6 +37,7 @@ export interface MemberJSON {
   invitedById: string | null;
   lastActiveAt: Date | null;
   preferences: Record<string, unknown>;
+  focusEndsAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

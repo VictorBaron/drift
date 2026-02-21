@@ -827,6 +827,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "json"
+        },
+        "focus_ends_at": {
+          "name": "focus_ends_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
         }
       },
       "name": "member",

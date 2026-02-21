@@ -14,6 +14,7 @@ export class MemberFactory {
       invitedById: null,
       lastActiveAt: new Date('2026-01-03'),
       preferences: MemberPreferences.empty(),
+      focusEndsAt: null,
       createdAt: new Date('2026-01-01'),
       updatedAt: new Date('2026-01-03'),
       deletedAt: null,

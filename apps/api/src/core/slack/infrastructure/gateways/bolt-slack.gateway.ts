@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import { App, ExpressReceiver, type InstallationStore } from '@slack/bolt';
 import type { Application } from 'express';
+import { StartFocusTimeCommand } from '@/accounts/application/commands/start-focus-time';
 import { FilterIncomingMessageCommand } from '@/messages/application/commands/filter-incoming-message';
 import { FilterIncomingReactionCommand } from '@/messages/application/commands/filter-incoming-reaction';
 import { SlackGateway } from '@/slack/domain/slack.gateway';
@@ -93,6 +94,22 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
           reactionEvent: event,
         }),
       );
+    });
+
+    this.bolt.command('/focus', async ({ ack, command }) => {
+      await ack();
+      const minutes = parseInt(command.text?.trim() ?? '30', 10) || 30;
+      try {
+        await this.commandBus.execute(
+          new StartFocusTimeCommand({
+            slackUserId: command.user_id,
+            teamId: command.team_id,
+            minutes,
+          }),
+        );
+      } catch (e) {
+        this.logger.error('Failed to start focus time', e);
+      }
     });
   }
 }

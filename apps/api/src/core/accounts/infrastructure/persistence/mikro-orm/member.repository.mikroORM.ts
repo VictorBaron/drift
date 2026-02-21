@@ -97,4 +97,9 @@ export class MemberRepositoryMikroOrm
     });
     return this.mapArrayToDomain(entities);
   }
+
+  async findAll(): Promise<Member[]> {
+    const entities = await this.find({});
+    return this.mapArrayToDomain(entities);
+  }
 }

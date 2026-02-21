@@ -11,5 +11,6 @@ export abstract class MemberRepository extends RepositoryPort<Member> {
   abstract findActiveAdminsByAccountId(accountId: string): Promise<Member[]>;
   abstract findManyByIds(ids: string[]): Promise<Member[]>;
   abstract findManyByAccountIdAndSlackUserIds(args: { accountId: string; slackUserIds: string[] }): Promise<Member[]>;
+  abstract findAll(): Promise<Member[]>;
   abstract softDelete(member: Member): Promise<void>;
 }

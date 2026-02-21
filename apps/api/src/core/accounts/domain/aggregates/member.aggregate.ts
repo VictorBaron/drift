@@ -1,6 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { AggregateRoot } from 'common/domain';
 import {
+  FocusTimeStartedEvent,
   MemberActivatedEvent,
   MemberDisabledEvent,
   MemberEnabledEvent,
@@ -21,6 +22,7 @@ export class Member extends AggregateRoot {
   private invitedById: string | null;
   private lastActiveAt: Date | null;
   private preferences: MemberPreferences;
+  private focusEndsAt: Date | null;
 
   private constructor(props: MemberProps) {
     super(props);
@@ -33,6 +35,7 @@ export class Member extends AggregateRoot {
     this.invitedById = props.invitedById;
     this.lastActiveAt = props.lastActiveAt;
     this.preferences = props.preferences;
+    this.focusEndsAt = props.focusEndsAt;
   }
 
   static invite({ inviter, user }: CreateMemberProps): Member {
@@ -53,6 +56,7 @@ export class Member extends AggregateRoot {
       invitedById: inviter.id,
       lastActiveAt: null,
       preferences: MemberPreferences.empty(),
+      focusEndsAt: null,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -83,6 +87,7 @@ export class Member extends AggregateRoot {
       invitedById: null,
       lastActiveAt: now,
       preferences: MemberPreferences.empty(),
+      focusEndsAt: null,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -175,6 +180,26 @@ export class Member extends AggregateRoot {
         actor: activatedBy,
       }),
     );
+  }
+
+  startFocusTime(minutes: number): void {
+    const endsAt = new Date(Date.now() + minutes * 60 * 1000);
+    this.focusEndsAt = endsAt;
+    this.updatedAt = new Date();
+    this.addDomainEvent(new FocusTimeStartedEvent({ member: this, endsAt }));
+  }
+
+  stopFocusTime(): void {
+    this.focusEndsAt = null;
+    this.updatedAt = new Date();
+  }
+
+  isInFocusTime(): boolean {
+    return this.focusEndsAt !== null && this.focusEndsAt > new Date();
+  }
+
+  getFocusEndsAt(): Date | null {
+    return this.focusEndsAt;
   }
 
   canDisable(): boolean {
@@ -270,6 +295,7 @@ export class Member extends AggregateRoot {
       invitedById: this.invitedById,
       lastActiveAt: this.lastActiveAt,
       preferences: this.preferences.getValue(),
+      focusEndsAt: this.focusEndsAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,

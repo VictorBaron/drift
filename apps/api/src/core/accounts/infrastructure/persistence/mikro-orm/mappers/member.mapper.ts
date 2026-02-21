@@ -20,6 +20,7 @@ export class MemberMapper {
       invitedById: raw.invitedById,
       lastActiveAt: raw.lastActiveAt,
       preferences: MemberPreferences.create(raw.preferences),
+      focusEndsAt: raw.focusEndsAt,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       deletedAt: raw.deletedAt,
@@ -42,6 +43,7 @@ export class MemberMapper {
       invitedById: json.invitedById,
       lastActiveAt: json.lastActiveAt,
       preferences: json.preferences,
+      focusEndsAt: json.focusEndsAt,
     });
 
     return entity;
