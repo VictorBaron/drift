@@ -84,6 +84,55 @@ pnpm start:prod       # Run compiled API
 
 The API follows NestJS modular architecture with domain-based modules.
 
+### Repository Structure
+
+```
+src/
+  common/                        # Shared base classes and utilities
+    domain/                      # Base aggregate, repository, value object classes
+    application/                 # Shared application-level types
+    dto/                         # Shared DTOs
+    types/                       # Shared TypeScript types
+
+  auth/                          # Google OAuth authentication
+  health/                        # Health check endpoint
+
+  core/                          # Domain modules (one per bounded context)
+    <module>/                    # e.g. messages, accounts, users, channels, conversations, scoring, slack
+      __tests__/
+        factories/               # Test data factories for the module
+      domain/
+        aggregates/              # Domain aggregate(s) with business logic
+        repositories/            # Repository port interfaces
+        gateways/                # External API gateway port interfaces
+        events/                  # Domain events
+        value-objects/           # Value objects (if any)
+      application/
+        commands/                # Command handlers (write use cases) + tests co-located
+        queries/                 # Query handlers (read use cases)
+        services/                # Application services (if needed)
+      infrastructure/
+        persistence/
+          <module>-persistence.module.ts   # Dynamic module switching ORM vs in-memory
+          in-memory/             # In-memory repository implementation (for tests)
+          mikro-orm/
+            models/              # MikroORM entity files (*.mikroORM.ts)
+            mappers/             # Mapper classes (domain ↔ persistence)
+            *.repository.mikroORM.ts       # MikroORM repository implementation
+            mikro-orm-*-persistence.module.ts
+        gateways/                # External API adapter implementations
+          fake-*.gateway.ts      # Fake/stub gateway for tests
+        controllers/             # HTTP controllers (if the module exposes REST endpoints)
+      <module>.module.ts         # NestJS module wiring
+```
+
+**Naming conventions:**
+- MikroORM entity files: `<entity>.mikroORM.ts`
+- MikroORM repository: `<entity>.repository.mikroORM.ts`
+- In-memory repository: `<entity>.repository.in-memory.ts`
+- Fake gateways (for tests): `fake-<gateway>.gateway.ts`
+- Tests co-located with production code: `<file>.test.ts`
+
 ## Tech Stack
 
 - **Runtime:** Node 20, TypeScript (ES2021, strict mode)
