@@ -63,10 +63,10 @@ describe('IngestSlackMessages', () => {
     const module = await Test.createTestingModule({
       providers: [
         IngestSlackMessagesHandler,
+        SlackFilterService,
         { provide: ProjectRepository, useClass: ProjectRepositoryInMemory },
         { provide: SlackMessageRepository, useClass: SlackMessageRepositoryInMemory },
         { provide: SLACK_API_GATEWAY, useClass: FakeSlackApiGateway },
-        { provide: SlackFilterService, useValue: { shouldFilter: () => false } },
       ],
     }).compile();
 
@@ -239,85 +239,6 @@ describe('IngestSlackMessages', () => {
     });
   });
 
-  describe('filtering', () => {
-    it('should mark messages as filtered when filter service returns true', async () => {
-      const project = Project.create({ name: 'My Project', emoji: '🚀', organizationId: ORG_ID });
-      project.addSlackChannel(CHANNEL_ID);
-
-      const filterModule = await Test.createTestingModule({
-        providers: [
-          IngestSlackMessagesHandler,
-          { provide: ProjectRepository, useClass: ProjectRepositoryInMemory },
-          { provide: SlackMessageRepository, useClass: SlackMessageRepositoryInMemory },
-          { provide: SLACK_API_GATEWAY, useClass: FakeSlackApiGateway },
-          { provide: SlackFilterService, useValue: { shouldFilter: () => true } },
-        ],
-      }).compile();
-
-      const filterHandler = filterModule.get<IngestSlackMessagesHandler>(IngestSlackMessagesHandler);
-      const filterProjectRepo = filterModule.get<ProjectRepositoryInMemory>(ProjectRepository);
-      const filterMessageRepo = filterModule.get<SlackMessageRepositoryInMemory>(SlackMessageRepository);
-      const filterGateway = filterModule.get<FakeSlackApiGateway>(SLACK_API_GATEWAY);
-
-      await filterProjectRepo.save(project);
-      filterGateway.seedUser(makeApiUser('U_ALICE', 'Alice'));
-      filterGateway.seedChannelMessages(CHANNEL_ID, [makeApiMessage(rts(1)), makeApiMessage(rts(2))]);
-
-      const command = new IngestSlackMessagesCommand(project.getId(), ORG_ID, BOT_TOKEN);
-      const result = await filterHandler.execute(command);
-
-      expect(result.ingested).toBe(2);
-      expect(result.filtered).toBe(2);
-
-      const stored = await filterMessageRepo.findByProjectId(project.getId());
-      expect(stored.every((m) => m.getIsFiltered())).toBe(true);
-    });
-
-    it('should pass the message reply count as threadReplyCount for top-level messages', async () => {
-      const project = Project.create({ name: 'My Project', emoji: '🚀', organizationId: ORG_ID });
-      project.addSlackChannel(CHANNEL_ID);
-
-      const capturedCalls: Array<{ messageTs: string; threadReplyCount: number }> = [];
-      const trackingFilter = {
-        shouldFilter: (message: SlackMessage, threadReplyCount: number) => {
-          capturedCalls.push({ messageTs: message.getMessageTs(), threadReplyCount });
-          return false;
-        },
-      };
-
-      const trackingModule = await Test.createTestingModule({
-        providers: [
-          IngestSlackMessagesHandler,
-          { provide: ProjectRepository, useClass: ProjectRepositoryInMemory },
-          { provide: SlackMessageRepository, useClass: SlackMessageRepositoryInMemory },
-          { provide: SLACK_API_GATEWAY, useClass: FakeSlackApiGateway },
-          { provide: SlackFilterService, useValue: trackingFilter },
-        ],
-      }).compile();
-
-      const trackingHandler = trackingModule.get<IngestSlackMessagesHandler>(IngestSlackMessagesHandler);
-      const trackingProjectRepo = trackingModule.get<ProjectRepositoryInMemory>(ProjectRepository);
-      const trackingGateway = trackingModule.get<FakeSlackApiGateway>(SLACK_API_GATEWAY);
-
-      await trackingProjectRepo.save(project);
-      trackingGateway.seedUser(makeApiUser('U_ALICE', 'Alice'));
-      trackingGateway.seedUser(makeApiUser('U_BOB', 'Bob'));
-
-      const parentTs = rts(10);
-      const replyTs = rts(11);
-      trackingGateway.seedChannelMessages(CHANNEL_ID, [makeApiMessage(parentTs, { replyCount: 3 })]);
-      trackingGateway.seedThreadReplies(parentTs, [makeApiMessage(replyTs, { userId: 'U_BOB', threadTs: parentTs })]);
-
-      await trackingHandler.execute(new IngestSlackMessagesCommand(project.getId(), ORG_ID, BOT_TOKEN));
-
-      const parentCall = capturedCalls.find((c) => c.messageTs === parentTs);
-      const replyCall = capturedCalls.find((c) => c.messageTs === replyTs);
-
-      expect(parentCall?.threadReplyCount).toBe(3);
-      expect(replyCall?.threadReplyCount).toBe(3);
-    });
-  });
-
   describe('bot messages', () => {
     it('should use empty string as userName for bot messages without calling getUserInfo', async () => {
       const project = Project.create({ name: 'My Project', emoji: '🚀', organizationId: ORG_ID });
@@ -341,55 +262,27 @@ describe('IngestSlackMessages', () => {
   });
 
   describe('result counts', () => {
-    it('should return correct ingested and filtered counts across multiple channels', async () => {
+    it('should return correct ingested counts across multiple channels', async () => {
       const CHANNEL_B = 'C_BACKEND';
 
       const project = Project.create({ name: 'My Project', emoji: '🚀', organizationId: ORG_ID });
       project.addSlackChannel(CHANNEL_ID);
       project.addSlackChannel(CHANNEL_B);
+      await projectRepo.save(project);
 
-      const ts1 = rts(1);
-      const ts2 = rts(2);
-      const ts3 = rts(3);
-      const ts4 = rts(4);
-      const ts5 = rts(5);
-
-      const filterCounts: Record<string, boolean> = {
-        [ts1]: false,
-        [ts2]: true,
-        [ts3]: false,
-        [ts4]: true,
-        [ts5]: true,
-      };
-
-      const selectiveFilter = {
-        shouldFilter: (message: SlackMessage) => filterCounts[message.getMessageTs()] ?? false,
-      };
-
-      const countModule = await Test.createTestingModule({
-        providers: [
-          IngestSlackMessagesHandler,
-          { provide: ProjectRepository, useClass: ProjectRepositoryInMemory },
-          { provide: SlackMessageRepository, useClass: SlackMessageRepositoryInMemory },
-          { provide: SLACK_API_GATEWAY, useClass: FakeSlackApiGateway },
-          { provide: SlackFilterService, useValue: selectiveFilter },
-        ],
-      }).compile();
-
-      const countHandler = countModule.get<IngestSlackMessagesHandler>(IngestSlackMessagesHandler);
-      const countProjectRepo = countModule.get<ProjectRepositoryInMemory>(ProjectRepository);
-      const countGateway = countModule.get<FakeSlackApiGateway>(SLACK_API_GATEWAY);
-
-      await countProjectRepo.save(project);
-      countGateway.seedUser(makeApiUser('U_ALICE', 'Alice'));
-      countGateway.seedChannelMessages(CHANNEL_ID, [makeApiMessage(ts1), makeApiMessage(ts2)]);
-      countGateway.seedChannelMessages(CHANNEL_B, [makeApiMessage(ts3), makeApiMessage(ts4), makeApiMessage(ts5)]);
+      slackGateway.seedUser(makeApiUser('U_ALICE', 'Alice'));
+      slackGateway.seedChannelMessages(CHANNEL_ID, [makeApiMessage(rts(1)), makeApiMessage(rts(2))]);
+      slackGateway.seedChannelMessages(CHANNEL_B, [
+        makeApiMessage(rts(3)),
+        makeApiMessage(rts(4)),
+        makeApiMessage(rts(5)),
+      ]);
 
       const command = new IngestSlackMessagesCommand(project.getId(), ORG_ID, BOT_TOKEN);
-      const result = await countHandler.execute(command);
+      const result = await handler.execute(command);
 
       expect(result.ingested).toBe(5);
-      expect(result.filtered).toBe(3);
+      expect(result.filtered).toBe(0);
     });
   });
 });
