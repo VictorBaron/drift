@@ -128,6 +128,15 @@ src/
 - **Database:** PostgreSQL 16, MikroORM
 - **Auth:** @nestjs/passport, @nestjs/jwt
 
+## Code Style
+
+### Function Size & Complexity
+
+- **Keep functions small and single-purpose** — if a function does more than one thing, split it.
+- **Max ~20 lines per function** — beyond that, extract named private methods.
+- Each extracted method should have a name that reads like a sentence describing what it does (e.g., `resolveUserNames`, `collectMessagesWithReplies`).
+- Prefer many small methods over one large method with comments dividing sections.
+
 ## Constraints
 
 - Do not use parent repositories in import paths:

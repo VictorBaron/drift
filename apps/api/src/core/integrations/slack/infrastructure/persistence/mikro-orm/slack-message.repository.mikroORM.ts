@@ -23,6 +23,11 @@ export class SlackMessageRepositoryMikroOrm
     return entity ? SlackMessageMapper.toDomain(entity) : null;
   }
 
+  async findLatestByChannelId(channelId: string): Promise<SlackMessage | null> {
+    const entity = await this.em.findOne(SlackMessageMikroOrm, { channelId }, { orderBy: { messageTs: 'DESC' } });
+    return entity ? SlackMessageMapper.toDomain(entity) : null;
+  }
+
   async findByProjectId(projectId: string, since?: Date): Promise<SlackMessage[]> {
     const where = since ? { projectId, ingestedAt: { $gte: since } } : { projectId };
     const entities = await this.em.find(SlackMessageMikroOrm, where, {

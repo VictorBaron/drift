@@ -171,7 +171,7 @@ import { cn } from '@/lib/utils';
 
 ## Testing Guidelines
 
-- Write tests with **Vitest** and **React Testing Library**.
+- Write tests with **Jest** and **React Testing Library**.
 - Test **behaviour**, not implementation details — query by role, label, or text.
 - Aim for high coverage on utility functions and hooks; integration-level tests for complex features.
 - Mock network requests with **MSW** (Mock Service Worker) where possible.

@@ -8,6 +8,12 @@ export class SlackMessageRepositoryInMemory extends RepositoryInMemory<SlackMess
     return this.find((msg) => msg.getChannelId() === channelId && msg.getMessageTs() === messageTs);
   }
 
+  async findLatestByChannelId(channelId: string): Promise<SlackMessage | null> {
+    const messages = await this.filter((msg) => msg.getChannelId() === channelId);
+    if (messages.length === 0) return null;
+    return messages.reduce((latest, msg) => (msg.getMessageTs() > latest.getMessageTs() ? msg : latest));
+  }
+
   findByProjectId(projectId: string, since?: Date): Promise<SlackMessage[]> {
     return this.filter((msg) => {
       if (msg.getProjectId() !== projectId) return false;
