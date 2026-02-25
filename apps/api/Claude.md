@@ -121,6 +121,26 @@ src/
 - Fake gateways (for tests): `fake-<gateway>.gateway.ts`
 - Tests co-located with production code: `<file>.test.ts`
 
+### Testing Rules (MANDATORY)
+
+**What can be faked in tests:**
+- **Gateways only** — only fake adapters to the external world (Slack API, Linear API, Claude API, etc.)
+  - Example: `FakeSlackApiGateway`, placed in `infrastructure/gateways/`
+- **In-memory repositories** — allowed because they implement the same port interface as the real repo
+
+**What must NEVER be faked:**
+- **Command handlers** — never write `FakeXxxHandler` classes; test the real handler
+- **Domain services** — inject the real service class via NestJS DI, never mock or stub it
+- **Application services** — inject the real class
+
+**Test module setup:**
+- Always use a shared `beforeEach` with `Test.createTestingModule` — never create ad-hoc modules inside individual `it` blocks
+- Register real domain services directly: `SlackFilterService` (not `{ provide: SlackFilterService, useValue: ... }`)
+
+**Test file scope:**
+- Each test file covers exactly one unit (one handler, one service, one cron job)
+- Never mix tests for different handlers or infrastructure classes in the same file
+
 ## Tech Stack
 
 - **Runtime:** Node 20, TypeScript (ES2021, strict mode)
