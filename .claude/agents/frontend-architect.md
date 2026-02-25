@@ -5,6 +5,7 @@ model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
 skills:
   - front-end
+  - afrexai-react-production
 ---
 
 # Frontend Architect
