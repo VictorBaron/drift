@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
 import type { Installation, InstallationQuery, InstallationStore } from '@slack/bolt';
-import { ProvisionAccountFromSlackCommand } from '@/accounts/application/commands/provision-account-from-slack';
 import { type CreateSlackInstallationProps, SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
 import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
 import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
 
 @Injectable()
 export class SlackInstallationStore implements InstallationStore {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly repository: SlackInstallationRepository,
-  ) {}
+  constructor(private readonly repository: SlackInstallationRepository) {}
 
   async storeInstallation<AuthVersion extends 'v1' | 'v2'>(
     installation: Installation<AuthVersion, boolean>,
@@ -38,15 +33,6 @@ export class SlackInstallationStore implements InstallationStore {
 
     if (!teamId) return;
     if (!fields.botToken) return;
-
-    this.commandBus.execute(
-      new ProvisionAccountFromSlackCommand({
-        teamId,
-        teamName: fields.teamName ?? teamId,
-        botToken: fields.botToken,
-        installerSlackUserId: fields.userId,
-      }),
-    );
   }
 
   async createOrUpdate({ fields }: { fields: CreateSlackInstallationProps }): Promise<SlackInstallation> {

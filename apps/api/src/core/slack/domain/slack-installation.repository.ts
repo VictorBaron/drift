@@ -7,8 +7,6 @@ export interface SlackInstallationLookup {
   enterpriseId: string | null;
 }
 
-export const SLACK_GATEWAY = 'SLACK_GATEWAY';
-
 export abstract class SlackInstallationRepository extends RepositoryPort<SlackInstallation> {
   abstract findByTeamAndEnterprise({
     teamId,

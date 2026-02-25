@@ -1,52 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { BaseService } from 'common/application/service';
-import { UrgencyScoringResult } from '@/scoring/domain/gateways/urgency-scoring.gateway';
 
 @Injectable()
 export class ParseJsonOutputService extends BaseService {
   private retries: number;
 
-  parse(rawJson: string, retries = 0) {
+  parse<T>(rawJson: string, retries = 0): T | null {
     this.retries = retries;
     try {
-      const parsed = this.parseJsonOutput(rawJson) as UrgencyScoringResult;
-      if (!parsed.score || parsed.score < 1 || parsed.score > 5) {
-        this.logger.warn('No score', parsed);
-        return {
-          score: 5,
-          reasoning: 'No reasoning - AI failed to evaluate this message',
-          confidenceScore: 0,
-        };
-      }
-      return {
-        score: parsed.score,
-        reasoning: parsed.reasoning ?? 'No reasoning',
-        confidenceScore: parsed.confidenceScore ?? 0,
-      };
+      const parsed = this.parseJsonOutput(rawJson) as T;
+      return parsed;
     } catch (e) {
       this.logger.log(rawJson);
       this.logger.error(e);
 
       if (this.retries) {
-        return this.retryParsing();
+        return this.retryParsing<T>();
       }
 
-      return {
-        score: 5,
-        reasoning: 'No reasoning - AI failed to evaluate this message',
-        confidenceScore: 0,
-      };
+      return null;
     }
   }
 
-  private retryParsing() {
+  private retryParsing<T>(): T | null {
     this.retries--;
     // TODO: retry with AI
-    return {
-      score: 5,
-      reasoning: 'No reasoning - AI failed to evaluate this message',
-      confidenceScore: 0,
-    };
+    return null;
   }
 
   private parseJsonOutput(raw: string) {
