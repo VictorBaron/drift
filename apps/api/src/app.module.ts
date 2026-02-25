@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
 import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
 import { AiModule } from '@/ai/ai.module';
@@ -37,12 +38,13 @@ const entities = [
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     CqrsModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 30 }]),
     MikroOrmModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
         entities,
         driver: PostgreSqlDriver,
         clientUrl: config.get<string>('DATABASE_URL'),
-        allowGlobalContext: true,
+        allowGlobalContext: config.get('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],
     }),
@@ -57,6 +59,9 @@ const entities = [
     PipelineModule,
     SchedulerModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
+  providers: [
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}

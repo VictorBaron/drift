@@ -1,10 +1,10 @@
 import { CommandBus } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import type { Installation } from '@slack/bolt';
-
+import { TokenEncryption } from 'auth/token-encryption';
 import { SlackInstallationFactory } from '@/slack/__tests__/factories/slack-installation.factory';
+import { SlackInstallationJSON } from '@/slack/domain/slack-installation.aggregate';
 import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
-
 import { SlackInstallationRepositoryInMemory } from './in-memory/slack-installation.repository.in-memory';
 import { SlackInstallationStore } from './slack-installation.store';
 
@@ -44,6 +44,13 @@ describe('SlackInstallation Store', () => {
           provide: CommandBus,
           useValue: { execute: jest.fn() },
         },
+        {
+          provide: TokenEncryption,
+          useValue: {
+            encrypt: jest.fn().mockReturnValue('enc-bot-token'),
+            decrypt: jest.fn().mockReturnValue('xoxb-bot-token'),
+          },
+        },
       ],
     }).compile();
 
@@ -62,16 +69,37 @@ describe('SlackInstallation Store', () => {
       await store.storeInstallation(buildInstallation());
 
       const installation = await repository.findByTeamId('T123');
-      expect(installation?.toJSON()).toMatchObject(
+      expect(installation?.toJSON()).toMatchObject<Partial<SlackInstallationJSON>>(
         expect.objectContaining({
           teamId: 'T123',
           enterpriseId: null,
           userId: 'U456',
-          botToken: 'xoxb-bot-token',
-          userToken: 'xoxp-user-token',
+          botToken: 'enc-bot-token',
+          userToken: 'enc-bot-token',
           botId: 'B789',
           botUserId: 'UB789',
           isEnterpriseInstall: false,
+          rawInstallation: expect.objectContaining({
+            appId: 'A111',
+            bot: expect.objectContaining({
+              id: 'B789',
+              scopes: ['chat:write'],
+              token: 'xoxb-bot-token',
+              userId: 'UB789',
+            }),
+            enterprise: undefined,
+            isEnterpriseInstall: false,
+            team: expect.objectContaining({
+              id: 'T123',
+              name: 'Test Team',
+            }),
+            tokenType: 'bot',
+            user: expect.objectContaining({
+              id: 'U456',
+              scopes: ['channels:read'],
+              token: 'xoxp-user-token',
+            }),
+          }),
         }),
       );
     });
@@ -93,11 +121,20 @@ describe('SlackInstallation Store', () => {
       await store.storeInstallation(buildInstallation());
 
       const updated = await repository.findById(existing.id);
-      expect(updated?.toJSON()).toMatchObject(
+      expect(updated?.toJSON()).toMatchObject<Partial<SlackInstallationJSON>>(
         expect.objectContaining({
           userId: 'U456',
-          botToken: 'xoxb-bot-token',
-          userToken: 'xoxp-user-token',
+          botToken: 'enc-bot-token',
+          userToken: 'enc-bot-token',
+          rawInstallation: expect.objectContaining({
+            appId: 'A111',
+            bot: expect.objectContaining({
+              id: 'B789',
+              scopes: ['chat:write'],
+              token: 'xoxb-bot-token',
+              userId: 'UB789',
+            }),
+          }),
         }),
       );
     });

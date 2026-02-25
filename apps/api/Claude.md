@@ -8,19 +8,7 @@ When implementing any new use case or change (does not apply for queries):
 
 1. **Write behavioral tests FIRST** — Before writing any production code, write tests that describe the expected behavior using BDD-style descriptions (`should ...`).
 2. **Use the test-writer agent** — Always delegate test writing to `@.claude/agents/test-writer`.
-3. **Get user review on tests** — After writing the tests, STOP and present them to the user for review. Do NOT proceed with implementation until the user approves the tests.
-4. **Then implement** — Only after test approval, write the production code to make the tests pass.
-
-## Purpose
-
-This project is named Drift.
-It's a SaaS to have better Slack notifications that fits your schedule.
-It notifies you if it's urgent; or at the end of your focus time-blockers or meetings.
-
-## Technical details
-
-Drift is a pnpm monorepo with a NestJS API backend and React frontend.
-Authentication is via Google OAuth.
+3. **Then implement** — Write the production code to make the tests pass.
 
 ### Architecture (MANDATORY)
 
@@ -138,7 +126,7 @@ src/
 - **Runtime:** Node 20, TypeScript (ES2021, strict mode)
 - **Backend:** NestJS 11, Express 5, Passport.js
 - **Database:** PostgreSQL 16, MikroORM
-- **Auth:** @nestjs/passport, passport-google-oauth20, @nestjs/jwt
+- **Auth:** @nestjs/passport, @nestjs/jwt
 
 ## Constraints
 

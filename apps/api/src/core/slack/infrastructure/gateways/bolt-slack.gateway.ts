@@ -6,10 +6,10 @@ import { WebClient } from '@slack/web-api';
 import { TokenEncryption } from 'auth/token-encryption';
 import type { Application } from 'express';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { Member } from '@/accounts/domain/aggregates/member.aggregate';
-import { Organization } from '@/accounts/domain/aggregates/organization.aggregate';
-import { MemberRepository } from '@/accounts/domain/repositories/member.repository';
-import { OrganizationRepository } from '@/accounts/domain/repositories/organization.repository';
+import {
+  RegisterSlackInstallationCommand,
+  RegisterSlackInstallationHandler,
+} from '@/slack/application/commands/register-slack-installation/register-slack-installation.handler';
 import { SlackGateway } from '@/slack/domain/slack.gateway';
 import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/slack/types';
@@ -37,8 +37,7 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
     private config: ConfigService,
     @Inject(INSTALLATION_STORE)
     private installationStore: InstallationStore,
-    private orgRepo: OrganizationRepository,
-    private memberRepo: MemberRepository,
+    private registerSlackInstallation: RegisterSlackInstallationHandler,
     private jwtService: JwtService,
     private tokenEncryption: TokenEncryption,
   ) {
@@ -99,31 +98,22 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
       const name = profile?.real_name ?? userInfo?.user?.name ?? '';
       const avatarUrl = profile?.image_192 ?? null;
 
-      const encryptedBotToken = this.tokenEncryption.encrypt(botToken);
+      const command = new RegisterSlackInstallationCommand(
+        teamId,
+        teamName,
+        this.tokenEncryption.encrypt(botToken),
+        userId,
+        userToken ? this.tokenEncryption.encrypt(userToken) : null,
+        email,
+        name,
+        avatarUrl,
+      );
 
-      let org = await this.orgRepo.findBySlackTeamId(teamId);
-      if (!org) {
-        org = Organization.create({ name: teamName, slackTeamId: teamId, slackBotToken: encryptedBotToken });
-      } else {
-        org.updateSlackBotToken(encryptedBotToken);
-      }
-      if (userToken) org.addSlackUserToken(userId, userToken);
-      await this.orgRepo.save(org);
+      const { memberId, orgId } = await this.registerSlackInstallation.execute(command);
 
-      let member = await this.memberRepo.findBySlackUserId(userId);
-      if (!member) {
-        member = Member.create({
-          email,
-          name,
-          slackUserId: userId,
-          avatarUrl,
-          role: 'admin',
-          organizationId: org.getId(),
-        });
-        await this.memberRepo.save(member);
-      }
+      this.logger.log(`OAuth install: userId=${userId} teamId=${teamId} member=${memberId}`);
 
-      const token = this.jwtService.sign({ sub: member.getId(), orgId: org.getId() });
+      const token = this.jwtService.sign({ sub: memberId, orgId });
       const isProduction = this.config.get('NODE_ENV') === 'production';
       const cookieFlags = `HttpOnly; Path=/; SameSite=Lax${isProduction ? '; Secure' : ''}`;
 

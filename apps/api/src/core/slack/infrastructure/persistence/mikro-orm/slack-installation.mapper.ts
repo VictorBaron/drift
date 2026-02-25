@@ -1,5 +1,5 @@
 import type { Installation } from '@slack/bolt';
-
+import { TokenEncryption } from 'auth/token-encryption';
 import { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
 
 import { SlackInstallationMikroOrm } from './models/slack-installation.mikroORM';
@@ -51,7 +51,10 @@ export class SlackInstallationMapper {
     return entity;
   }
 
-  static toInstallation(slackInstallation: SlackInstallation): Installation<'v1' | 'v2', boolean> {
+  static toInstallation(
+    slackInstallation: SlackInstallation,
+    tokenEncryption: TokenEncryption,
+  ): Installation<'v1' | 'v2', boolean> {
     const json = slackInstallation.toJSON();
     return {
       team: { id: json.teamId ?? '', name: json.teamName ?? '' },
@@ -61,21 +64,21 @@ export class SlackInstallationMapper {
       },
       user: {
         id: json.userId,
-        token: json.userToken ?? undefined,
+        token: json.userToken ? tokenEncryption.decrypt(json.userToken) : undefined,
         scopes: undefined,
       },
       bot:
         json.botId && json.botToken && json.botUserId
           ? {
               id: json.botId,
-              token: json.botToken,
+              token: tokenEncryption.decrypt(json.botToken),
               userId: json.botUserId,
               scopes: [],
             }
           : undefined,
       tokenType: json.tokenType === 'bot' ? 'bot' : undefined,
       isEnterpriseInstall: json.isEnterpriseInstall,
-      appId: process.env.SLACK_APP_ID,
+      appId: undefined,
       metadata: undefined,
     };
   }

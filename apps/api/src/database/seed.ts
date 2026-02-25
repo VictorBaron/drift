@@ -18,6 +18,8 @@ async function seed() {
     console.log('Seeding database...');
 
     // Organization
+    // Dev-only seed: slackBotToken is a fake placeholder and is intentionally unencrypted.
+    // In production, tokens are encrypted via TokenEncryption before being stored.
     const org = Organization.create({
       name: 'Acme Corp',
       slackTeamId: 'T_TEST',

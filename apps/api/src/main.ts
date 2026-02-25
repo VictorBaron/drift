@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { SLACK_GATEWAY, type SlackGateway } from '@/slack/domain/slack.gateway';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(helmet());
   app.use(cookieParser());
 
   app.enableCors({

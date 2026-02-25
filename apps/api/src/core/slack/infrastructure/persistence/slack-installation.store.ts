@@ -1,18 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import type { Installation, InstallationQuery, InstallationStore } from '@slack/bolt';
+import { TokenEncryption } from 'auth/token-encryption';
 import { type CreateSlackInstallationProps, SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
 import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
 import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
 
 @Injectable()
 export class SlackInstallationStore implements InstallationStore {
-  constructor(private readonly repository: SlackInstallationRepository) {}
+  constructor(
+    private readonly repository: SlackInstallationRepository,
+    private readonly tokenEncryption: TokenEncryption,
+  ) {}
 
   async storeInstallation<AuthVersion extends 'v1' | 'v2'>(
     installation: Installation<AuthVersion, boolean>,
   ): Promise<void> {
     const teamId = installation.team?.id ?? null;
     const enterpriseId = installation.enterprise?.id ?? null;
+    const rawUserToken = installation.user.token ?? null;
+    const rawBotToken = installation.bot?.token ?? null;
 
     const fields: CreateSlackInstallationProps = {
       teamId,
@@ -20,8 +26,8 @@ export class SlackInstallationStore implements InstallationStore {
       enterpriseId,
       enterpriseName: installation.enterprise?.name ?? null,
       userId: installation.user.id,
-      botToken: installation.bot?.token ?? null,
-      userToken: installation.user.token ?? null,
+      botToken: rawBotToken ? this.tokenEncryption.encrypt(rawBotToken) : null,
+      userToken: rawUserToken ? this.tokenEncryption.encrypt(rawUserToken) : null,
       botId: installation.bot?.id ?? null,
       botUserId: installation.bot?.userId ?? null,
       tokenType: installation.tokenType ?? null,
@@ -61,7 +67,7 @@ export class SlackInstallationStore implements InstallationStore {
       throw new Error(`Installation not found for team=${query.teamId} enterprise=${query.enterpriseId}`);
     }
 
-    return SlackInstallationMapper.toInstallation(entity);
+    return SlackInstallationMapper.toInstallation(entity, this.tokenEncryption);
   }
 
   async deleteInstallation(query: InstallationQuery<boolean>): Promise<void> {
