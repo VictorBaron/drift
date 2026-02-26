@@ -4,13 +4,54 @@ export type ProjectHealth = 'on-track' | 'at-risk' | 'off-track';
 export type DriftLevel = 'none' | 'low' | 'high';
 
 export interface ReportContent {
-  summary: string;
-  decisions: { title: string; description: string }[];
-  blockers: { title: string; description: string; severity: 'low' | 'medium' | 'high' }[];
-  deliveryProgress: string;
-  driftAnalysis: string;
-  highlights: string[];
-  nextWeekFocus: string[];
+  health: 'on-track' | 'at-risk' | 'off-track';
+  healthLabel: string;
+  progress: number;
+  narrative: string;
+  decisions: {
+    text: string;
+    tradeoff: string;
+    who: string;
+    where: string;
+    when: string;
+    alignedWithIntent: boolean | 'partial';
+  }[];
+  drift: {
+    level: 'none' | 'low' | 'high';
+    label: string;
+    details: string;
+  };
+  blockers: {
+    text: string;
+    owner: string;
+    severity: 'high' | 'medium' | 'low';
+    since: string;
+    impact: string;
+  }[];
+  keyResults: {
+    text: string;
+    done: boolean;
+  }[];
+  threads: {
+    title: string;
+    participants: string[];
+    messages: number;
+    outcome: string;
+    channel: string;
+  }[];
+  delivery: {
+    merged: number;
+    inReview: number;
+    blocked: number;
+    created: number;
+    velocity: string;
+    velocityLabel: string;
+  };
+  sourceCounts: {
+    slack: number;
+    linear: number;
+    notion: number;
+  };
 }
 
 interface ReportProps extends AggregateRootProps {
