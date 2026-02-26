@@ -19,22 +19,23 @@ Suivre l'architecture hexagonale.
 COMPOSANTS À CRÉER :
 
 1. NotionApiGateway (port interface dans domain/gateways/)
-   - Utiliser @notionhq/client
+   - Utiliser @notionhq/client ET notion-to-md
    - Token : NOTION_INTEGRATION_TOKEN (un seul token par workspace en V1, depuis .env)
    - Méthodes :
      * getPage(pageId) → { title, lastEditedTime, lastEditedBy }
-     * getPageContent(pageId) → string (texte extrait des blocks)
-       - Récupérer tous les blocks de la page (pagination)
-       - Extraire le texte de : paragraph, heading_1/2/3, bulleted_list_item,
-         numbered_list_item, to_do, toggle, code, quote, callout, divider
-       - Ignorer : image, video, embed, bookmark, file, table
-       - Limiter à 8000 caractères
+     * getPageContent(pageId) → string (contenu de la page en Markdown)
+       - Utiliser NotionToMarkdown de notion-to-md pour convertir les blocks
+       - Instancier NotionToMarkdown avec le même Client @notionhq/client
+       - Appeler n2m.pageToMarkdown(pageId) puis n2m.toMarkdownString(mdblocks)
+       - Retourner le champ `parent` de toMarkdownString (le markdown complet)
+       - Les types de blocks supportés (paragraph, headings, lists, code, etc.)
+         sont gérés nativement par notion-to-md
      * searchPages(query) → pages[] (pour l'onboarding)
    - Fake gateway pour les tests
 
 2. ReadNotionPageQuery (application/queries/)
    - Input : pageId
-   - Retourne le texte brut extrait (pour inclusion dans le prompt LLM)
+   - Retourne le contenu Markdown extrait (pour inclusion dans le prompt LLM)
 
 3. HasNotionPageChangedQuery (application/queries/)
    - Compare le lastEditedTime de la page avec la date du dernier rapport généré
@@ -46,6 +47,5 @@ NOTE : Pas de cron pour Notion. On lit la page au moment de la génération du r
 ## Validation
 
 - [ ] Avec un token Notion d'une Integration de test, getPage retourne la metadata
-- [ ] getPageContent extrait le texte de tous les types de blocks supportés
-- [ ] Le contenu est truncaté à 8000 caractères
+- [ ] getPageContent retourne le contenu en Markdown (headings, listes, code, etc.)
 - [ ] HasNotionPageChangedQuery détecte correctement les modifications
