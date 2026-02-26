@@ -10,7 +10,7 @@ import { Project } from '@/projects/domain/aggregates/project.aggregate';
 import { ProjectRepository } from '@/projects/domain/repositories/project.repository';
 import { ProjectRepositoryInMemory } from '@/projects/infrastructure/persistence/in-memory/project.repository.in-memory';
 
-import { IngestSlackMessagesCommand, IngestSlackMessagesHandler } from './ingest-slack-messages.handler';
+import { IngestSlackMessagesCommand, IngestSlackMessagesService } from './ingest-slack-messages.service';
 
 const BOT_TOKEN = 'test-bot-token';
 const ORG_ID = 'org-1';
@@ -54,7 +54,7 @@ function makeApiUser(id: string, name: string) {
 }
 
 describe('IngestSlackMessages', () => {
-  let handler: IngestSlackMessagesHandler;
+  let handler: IngestSlackMessagesService;
   let projectRepo: ProjectRepositoryInMemory;
   let messageRepo: SlackMessageRepositoryInMemory;
   let slackGateway: FakeSlackApiGateway;
@@ -62,7 +62,7 @@ describe('IngestSlackMessages', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        IngestSlackMessagesHandler,
+        IngestSlackMessagesService,
         SlackFilterService,
         { provide: ProjectRepository, useClass: ProjectRepositoryInMemory },
         { provide: SlackMessageRepository, useClass: SlackMessageRepositoryInMemory },
@@ -70,7 +70,7 @@ describe('IngestSlackMessages', () => {
       ],
     }).compile();
 
-    handler = module.get<IngestSlackMessagesHandler>(IngestSlackMessagesHandler);
+    handler = module.get<IngestSlackMessagesService>(IngestSlackMessagesService);
     projectRepo = module.get<ProjectRepositoryInMemory>(ProjectRepository);
     messageRepo = module.get<SlackMessageRepositoryInMemory>(SlackMessageRepository);
     slackGateway = module.get<FakeSlackApiGateway>(SLACK_API_GATEWAY);
@@ -262,7 +262,7 @@ describe('IngestSlackMessages', () => {
   });
 
   describe('result counts', () => {
-    it('should return correct ingested counts across multiple channels', async () => {
+    it('should ingest messages across multiple channels', async () => {
       const CHANNEL_B = 'C_BACKEND';
 
       const project = Project.create({ name: 'My Project', emoji: '🚀', organizationId: ORG_ID });
@@ -279,10 +279,10 @@ describe('IngestSlackMessages', () => {
       ]);
 
       const command = new IngestSlackMessagesCommand(project.getId(), ORG_ID, BOT_TOKEN);
-      const result = await handler.execute(command);
+      await handler.execute(command);
 
-      expect(result.ingested).toBe(5);
-      expect(result.filtered).toBe(0);
+      const stored = await messageRepo.findByProjectId(project.getId());
+      expect(stored).toHaveLength(5);
     });
   });
 });

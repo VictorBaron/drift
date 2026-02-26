@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import type { Installation, InstallationQuery, InstallationStore } from '@slack/bolt';
 import { TokenEncryption } from 'auth/token-encryption';
-import { type CreateSlackInstallationProps, SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
-import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
-import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
+import {
+  type CreateSlackInstallationProps,
+  SlackInstallation,
+} from '@/integrations/slack/domain/aggregates/slack-installation.aggregate';
+import { SlackInstallationRepository } from '@/integrations/slack/domain/repositories/slack-installation.repository';
+import { SlackInstallationMapper } from './mikro-orm/mappers/slack-installation.mapper';
 
 @Injectable()
 export class SlackInstallationStore implements InstallationStore {

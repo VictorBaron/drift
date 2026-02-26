@@ -1,4 +1,5 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { BaseService } from 'common/application/service';
 import { SlackMessage } from '@/integrations/slack/domain/aggregates/slack-message.aggregate';
 import type { SlackApiMessage } from '@/integrations/slack/domain/gateways/slack-api.gateway';
 import { SLACK_API_GATEWAY, SlackApiGateway } from '@/integrations/slack/domain/gateways/slack-api.gateway';
@@ -20,15 +21,15 @@ export interface IngestSlackMessagesResult {
 }
 
 @Injectable()
-export class IngestSlackMessagesHandler {
-  private readonly logger = new Logger(IngestSlackMessagesHandler.name);
-
+export class IngestSlackMessagesService extends BaseService {
   constructor(
     private readonly projectRepo: ProjectRepository,
     private readonly slackMessageRepo: SlackMessageRepository,
     @Inject(SLACK_API_GATEWAY) private readonly slackApiGateway: SlackApiGateway,
     private readonly slackFilterService: SlackFilterService,
-  ) {}
+  ) {
+    super();
+  }
 
   async execute(command: IngestSlackMessagesCommand): Promise<IngestSlackMessagesResult> {
     const { projectId, organizationId, decryptedBotToken } = command;

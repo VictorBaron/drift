@@ -15,6 +15,7 @@ export class FakeSlackApiGateway extends SlackApiGateway {
   private channels: SlackApiChannel[] = [];
   private users: Map<string, SlackApiUser> = new Map();
   private postedMessages: SlackApiPostedMessage[] = [];
+  private throwingChannels: Set<string> = new Set();
 
   seedChannelMessages(channelId: string, messages: SlackApiMessage[]): void {
     this.channelMessages.set(channelId, messages);
@@ -36,12 +37,17 @@ export class FakeSlackApiGateway extends SlackApiGateway {
     return this.postedMessages;
   }
 
+  throwForChannel(channelId: string): void {
+    this.throwingChannels.add(channelId);
+  }
+
   clear(): void {
     this.channelMessages.clear();
     this.threadReplies.clear();
     this.channels = [];
     this.users.clear();
     this.postedMessages = [];
+    this.throwingChannels.clear();
   }
 
   async getChannelHistory(
@@ -50,6 +56,10 @@ export class FakeSlackApiGateway extends SlackApiGateway {
     oldest?: string,
     latest?: string,
   ): Promise<SlackApiMessage[]> {
+    if (this.throwingChannels.has(channelId)) {
+      throw new Error(`Simulated gateway failure for channel ${channelId}`);
+    }
+
     const messages = this.channelMessages.get(channelId) ?? [];
 
     return messages.filter((msg) => {

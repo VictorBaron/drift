@@ -2,9 +2,9 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import type { Installation } from '@slack/bolt';
 import { TokenEncryption } from 'auth/token-encryption';
-import { SlackInstallationFactory } from '@/slack/__tests__/factories/slack-installation.factory';
-import { SlackInstallationJSON } from '@/slack/domain/slack-installation.aggregate';
-import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
+import { SlackInstallationFactory } from '@/integrations/slack/__tests__/factories/slack-installation.factory';
+import { SlackInstallationJSON } from '@/integrations/slack/domain/aggregates/slack-installation.aggregate';
+import { SlackInstallationRepository } from '@/integrations/slack/domain/repositories/slack-installation.repository';
 import { SlackInstallationRepositoryInMemory } from './in-memory/slack-installation.repository.in-memory';
 import { SlackInstallationStore } from './slack-installation.store';
 

@@ -9,11 +9,10 @@ import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/
 import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
 import { AiModule } from '@/ai/ai.module';
 import { LinearTicketSnapshotMikroOrm } from '@/integrations/linear/infrastructure/persistence/mikro-orm/models/linear-ticket-snapshot.mikroORM';
+import { SlackInstallationMikroOrm } from '@/integrations/slack/infrastructure/persistence/mikro-orm/models/slack-installation.mikroORM';
 import { SlackMessageMikroOrm } from '@/integrations/slack/infrastructure/persistence/mikro-orm/models/slack-message.mikroORM';
 import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 import { ReportMikroOrm } from '@/reports/infrastructure/persistence/mikro-orm/models/report.mikroORM';
-import { SlackInstallationMikroOrm } from '@/slack/infrastructure/persistence/mikro-orm/models/slack-installation.mikroORM';
-import { SlackModule } from '@/slack/slack.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AccountsModule } from './core/accounts/accounts.module';
@@ -50,7 +49,6 @@ const entities = [
     }),
     AiModule,
     HealthModule,
-    SlackModule,
     AuthModule,
     AccountsModule,
     ProjectsModule,

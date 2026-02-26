@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { SLACK_GATEWAY, type SlackGateway } from '@/slack/domain/slack.gateway';
+import { SLACK_GATEWAY, type SlackGateway } from '@/integrations/slack/domain/gateways/slack.gateway';
 import { AppModule } from './app.module';
 
 async function bootstrap() {

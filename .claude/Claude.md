@@ -50,8 +50,8 @@ apps/
 
 ### Slack / Bolt.js
 
-- Bolt app instance is created in the `SlackModule` and injected via NestJS DI
-- All event listeners and command handlers live in `src/core/slack/`
+- Bolt app instance is created in the `SlackIntegrationModule` and injected via NestJS DI
+- All event listeners and command handlers live in `src/core/integrations/slack/`
 - User tokens (not bot tokens) are stored per-installation for reading messages
 - Bot token is used for sending DMs
 - Respect Slack rate limits — use queuing for bulk DM sends

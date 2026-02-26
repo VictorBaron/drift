@@ -6,6 +6,7 @@ tools: Read, Write, Edit, Bash, Grep
 skills:
   - ddd
   - api-design
+  - unit-test
 ---
 
 # Backend Architect

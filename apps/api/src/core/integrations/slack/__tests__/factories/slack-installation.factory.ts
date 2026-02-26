@@ -1,4 +1,7 @@
-import { SlackInstallation, type SlackInstallationJSON } from '@/slack/domain/slack-installation.aggregate';
+import {
+  SlackInstallation,
+  type SlackInstallationJSON,
+} from '@/integrations/slack/domain/aggregates/slack-installation.aggregate';
 
 export class SlackInstallationFactory {
   static create(overrides?: Partial<SlackInstallationJSON>): SlackInstallation {

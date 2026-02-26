@@ -1,8 +1,8 @@
 import type { Installation } from '@slack/bolt';
 import { TokenEncryption } from 'auth/token-encryption';
-import { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
+import { SlackInstallation } from '@/integrations/slack/domain/aggregates/slack-installation.aggregate';
 
-import { SlackInstallationMikroOrm } from './models/slack-installation.mikroORM';
+import { SlackInstallationMikroOrm } from '../models/slack-installation.mikroORM';
 
 export class SlackInstallationMapper {
   static toDomain(raw: SlackInstallationMikroOrm): SlackInstallation {

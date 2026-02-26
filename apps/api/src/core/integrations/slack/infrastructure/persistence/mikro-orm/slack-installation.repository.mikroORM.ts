@@ -3,11 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { RepositoryMikroORM } from 'common/domain';
 
-import type { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
-import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
-
+import type { SlackInstallation } from '@/integrations/slack/domain/aggregates/slack-installation.aggregate';
+import { SlackInstallationRepository } from '@/integrations/slack/domain/repositories/slack-installation.repository';
+import { SlackInstallationMapper } from './mappers/slack-installation.mapper';
 import { SlackInstallationMikroOrm } from './models/slack-installation.mikroORM';
-import { SlackInstallationMapper } from './slack-installation.mapper';
 
 export interface SlackInstallationLookup {
   teamId: string | null;

@@ -14,6 +14,7 @@ When implementing any new use case or change (does not apply for queries):
 
 The back-end strictly follows **Hexagonal Architecture** and **Domain Driven Design**.
 Refer to these skills for guidance:
+
 - `.claude/skills/ddd/skill.md` — DDD patterns, aggregates, entities, value objects, repositories, mappers
 - `.claude/hexagonal-architecture.md` — Module structure and port/adapter constraints
 
@@ -115,31 +116,45 @@ src/
 ```
 
 **Naming conventions:**
+
 - MikroORM entity files: `<entity>.mikroORM.ts`
 - MikroORM repository: `<entity>.repository.mikroORM.ts`
 - In-memory repository: `<entity>.repository.in-memory.ts`
 - Fake gateways (for tests): `fake-<gateway>.gateway.ts`
 - Tests co-located with production code: `<file>.test.ts`
 
+**Persistence module (MANDATORY):**
+
+Every module that owns domain entities MUST expose a `<ModuleName>PersistenceModule` at `infrastructure/persistence/<module-name>.persistence-module.ts`. This NestJS module:
+
+- Imports the MikroORM feature module for the module's entities
+- Provides and exports the repository port bindings (e.g., `{ provide: OrganizationRepository, useClass: OrganizationRepositoryMikroOrm }`)
+- Is the **only** place other modules should import to get access to that module's repositories
+
+Other modules import `AccountsPersistenceModule` (not individual repositories or ORM models directly).
+
 ### Testing Rules (MANDATORY)
 
 **What can be faked in tests:**
+
 - **Gateways only** — only fake adapters to the external world (Slack API, Linear API, Claude API, etc.)
   - Example: `FakeSlackApiGateway`, placed in `infrastructure/gateways/`
 - **In-memory repositories** — allowed because they implement the same port interface as the real repo
 
 **What must NEVER be faked:**
+
 - **Command handlers** — never write `FakeXxxHandler` classes; test the real handler
 - **Domain services** — inject the real service class via NestJS DI, never mock or stub it
 - **Application services** — inject the real class
 
 **Test module setup:**
+
 - Always use a shared `beforeEach` with `Test.createTestingModule` — never create ad-hoc modules inside individual `it` blocks
 - Register real domain services directly: `SlackFilterService` (not `{ provide: SlackFilterService, useValue: ... }`)
 
 **Test file scope:**
-- Each test file covers exactly one unit (one handler, one service, one cron job)
-- Never mix tests for different handlers or infrastructure classes in the same file
+
+- Each test file covers one use case; the "unit" is the behavior, not the service or the command handler
 
 ## Tech Stack
 

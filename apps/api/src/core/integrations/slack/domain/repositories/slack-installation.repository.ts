@@ -1,6 +1,6 @@
 import { RepositoryPort } from 'common/domain';
 
-import type { SlackInstallation } from './slack-installation.aggregate';
+import type { SlackInstallation } from '../aggregates/slack-installation.aggregate';
 
 export interface SlackInstallationLookup {
   teamId: string | null;

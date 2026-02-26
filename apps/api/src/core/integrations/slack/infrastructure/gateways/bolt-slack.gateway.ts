@@ -1,18 +1,19 @@
 import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CommandBus } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { App, ExpressReceiver, type Installation, type InstallationStore } from '@slack/bolt';
 import { WebClient } from '@slack/web-api';
 import { TokenEncryption } from 'auth/token-encryption';
 import type { Application } from 'express';
 import type { IncomingMessage, ServerResponse } from 'http';
+import { SlackGateway } from '@/integrations/slack/domain/gateways/slack.gateway';
+import { INSTALLATION_STORE } from '@/integrations/slack/infrastructure/persistence/installation-store.token';
+import { isGenericMessage } from '@/integrations/slack/types';
 import {
   RegisterSlackInstallationCommand,
-  RegisterSlackInstallationHandler,
-} from '@/slack/application/commands/register-slack-installation/register-slack-installation.handler';
-import { SlackGateway } from '@/slack/domain/slack.gateway';
-import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
-import { isGenericMessage } from '@/slack/types';
+  RegisterSlackInstallationResult,
+} from '../../application/commands/register-slack-installation/register-slack-installation.handler';
 
 const SLACK_SCOPES = [
   'channels:history',
@@ -37,7 +38,7 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
     private config: ConfigService,
     @Inject(INSTALLATION_STORE)
     private installationStore: InstallationStore,
-    private registerSlackInstallation: RegisterSlackInstallationHandler,
+    private commandBus: CommandBus,
     private jwtService: JwtService,
     private tokenEncryption: TokenEncryption,
   ) {
@@ -109,7 +110,10 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
         avatarUrl,
       );
 
-      const { memberId, orgId } = await this.registerSlackInstallation.execute(command);
+      const { memberId, orgId } = await this.commandBus.execute<
+        RegisterSlackInstallationCommand,
+        RegisterSlackInstallationResult
+      >(command);
 
       this.logger.log(`OAuth install: userId=${userId} teamId=${teamId} member=${memberId}`);
 

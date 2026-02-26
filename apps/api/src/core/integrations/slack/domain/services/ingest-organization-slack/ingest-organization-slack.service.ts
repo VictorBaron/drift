@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { BaseService } from 'common/application/service';
 
 import { OrganizationRepository } from '@/accounts/domain/repositories/organization.repository';
 import {
   IngestSlackMessagesCommand,
-  IngestSlackMessagesHandler,
-  type IngestSlackMessagesResult,
-} from '@/integrations/slack/application/commands/ingest-slack-messages/ingest-slack-messages.handler';
+  IngestSlackMessagesService,
+} from '@/integrations/slack/domain/services/ingest-slack-messages/ingest-slack-messages.service';
 import { ProjectRepository } from '@/projects/domain/repositories/project.repository';
 
 export class IngestOrganizationSlackCommand {
@@ -18,14 +18,14 @@ export interface IngestOrganizationSlackResult {
 }
 
 @Injectable()
-export class IngestOrganizationSlackHandler {
-  private readonly logger = new Logger(IngestOrganizationSlackHandler.name);
-
+export class IngestOrganizationSlackService extends BaseService {
   constructor(
     private readonly organizationRepo: OrganizationRepository,
     private readonly projectRepo: ProjectRepository,
-    private readonly ingestHandler: IngestSlackMessagesHandler,
-  ) {}
+    private readonly ingestSlackMessages: IngestSlackMessagesService,
+  ) {
+    super();
+  }
 
   async execute(command: IngestOrganizationSlackCommand): Promise<IngestOrganizationSlackResult> {
     const { organizationId } = command;
@@ -41,7 +41,7 @@ export class IngestOrganizationSlackHandler {
 
     for (const project of projectsWithSlack) {
       try {
-        const result = await this.ingestHandler.execute(
+        const result = await this.ingestSlackMessages.execute(
           new IngestSlackMessagesCommand(project.getId(), org.getId(), org.getSlackBotToken()),
         );
         totalIngested += result.ingested;
