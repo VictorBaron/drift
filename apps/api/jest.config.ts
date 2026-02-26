@@ -7,6 +7,7 @@ export default {
     '^@/(.*)$': '<rootDir>/src/core/$1',
     '^common/(.*)$': '<rootDir>/src/common/$1',
     '^auth/(.*)$': '<rootDir>/src/auth/$1',
+    '^health/(.*)$': '<rootDir>/src/health/$1',
   },
   transform: {
     '^.+\\.ts$': [
@@ -25,6 +26,7 @@ export default {
     '!src/**/*.test.ts',
     '!src/**/*.controller.ts',
     '!src/**/*.typeorm.ts',
+    '!src/**/*.mikroORM.ts',
     '!src/**/infrastructure/**/*.ts',
     '!src/**/dto/**/*.ts',
     '!src/**/dto.ts',

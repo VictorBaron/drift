@@ -26,6 +26,15 @@ export class LinearTicketSnapshotRepositoryMikroOrm
     return entities.map(LinearTicketSnapshotMapper.toDomain);
   }
 
+  async findLatestByProjectId(projectId: string): Promise<LinearTicketSnapshot | null> {
+    const entity = await this.em.findOne(
+      LinearTicketSnapshotMikroOrm,
+      { projectId },
+      { orderBy: { snapshotDate: 'DESC' } },
+    );
+    return entity ? LinearTicketSnapshotMapper.toDomain(entity) : null;
+  }
+
   async saveMany(snapshots: LinearTicketSnapshot[]): Promise<LinearTicketSnapshot[]> {
     return super.saveMany(snapshots);
   }

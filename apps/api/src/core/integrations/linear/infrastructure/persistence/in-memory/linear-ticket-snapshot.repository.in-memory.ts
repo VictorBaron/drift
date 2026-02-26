@@ -14,6 +14,12 @@ export class LinearTicketSnapshotRepositoryInMemory
     );
   }
 
+  async findLatestByProjectId(projectId: string): Promise<LinearTicketSnapshot | null> {
+    const all = await this.filter((s) => s.getProjectId() === projectId);
+    if (all.length === 0) return null;
+    return all.sort((a, b) => b.toJSON().snapshotDate.getTime() - a.toJSON().snapshotDate.getTime())[0];
+  }
+
   async saveMany(snapshots: LinearTicketSnapshot[]): Promise<LinearTicketSnapshot[]> {
     for (const snapshot of snapshots) {
       await this.save(snapshot);
