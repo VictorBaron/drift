@@ -4,7 +4,7 @@ export type ProjectHealth = 'on-track' | 'at-risk' | 'off-track';
 export type DriftLevel = 'none' | 'low' | 'high';
 
 export interface ReportContent {
-  health: 'on-track' | 'at-risk' | 'off-track';
+  health: ProjectHealth;
   healthLabel: string;
   progress: number;
   narrative: string;
@@ -17,7 +17,7 @@ export interface ReportContent {
     alignedWithIntent: boolean | 'partial';
   }[];
   drift: {
-    level: 'none' | 'low' | 'high';
+    level: DriftLevel;
     label: string;
     details: string;
   };
@@ -55,6 +55,7 @@ export interface ReportContent {
 }
 
 interface ReportProps extends AggregateRootProps {
+  organizationId: string;
   projectId: string;
   weekStart: Date;
   weekEnd: Date;
@@ -79,6 +80,7 @@ interface ReportProps extends AggregateRootProps {
 
 export interface ReportJSON {
   id: string;
+  organizationId: string;
   projectId: string;
   weekStart: Date;
   weekEnd: Date;
@@ -105,6 +107,7 @@ export interface ReportJSON {
 }
 
 export interface GenerateReportProps {
+  organizationId: string;
   projectId: string;
   weekStart: Date;
   weekEnd: Date;
@@ -125,6 +128,7 @@ export interface GenerateReportProps {
 }
 
 export class Report extends AggregateRoot {
+  private organizationId: string;
   private projectId: string;
   private weekStart: Date;
   private weekEnd: Date;
@@ -148,6 +152,7 @@ export class Report extends AggregateRoot {
 
   private constructor(props: ReportProps) {
     super(props);
+    this.organizationId = props.organizationId;
     this.projectId = props.projectId;
     this.weekStart = props.weekStart;
     this.weekEnd = props.weekEnd;
@@ -212,6 +217,18 @@ export class Report extends AggregateRoot {
     return this.content;
   }
 
+  getWeekNumber(): number {
+    return this.weekNumber;
+  }
+
+  getPrevProgress(): number {
+    return this.prevProgress;
+  }
+
+  getPeriodLabel(): string {
+    return this.periodLabel;
+  }
+
   markDelivered(messageTs: string): void {
     this.slackDeliveredAt = new Date();
     this.slackMessageTs = messageTs;
@@ -221,6 +238,7 @@ export class Report extends AggregateRoot {
   toJSON(): ReportJSON {
     return {
       id: this.id,
+      organizationId: this.organizationId,
       projectId: this.projectId,
       weekStart: this.weekStart,
       weekEnd: this.weekEnd,

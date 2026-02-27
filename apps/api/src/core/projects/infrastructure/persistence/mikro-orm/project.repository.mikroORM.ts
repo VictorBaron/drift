@@ -24,13 +24,13 @@ export class ProjectRepositoryMikroOrm
   }
 
   async findByOrganizationId(organizationId: string): Promise<Project[]> {
-    const entities = await this.em.find(ProjectMikroOrm, { organizationId, deletedAt: null });
+    const entities = await this.em.find(ProjectMikroOrm, { organization: { id: organizationId }, deletedAt: null });
     return entities.map(ProjectMapper.toDomain);
   }
 
   async findActiveByOrganizationId(organizationId: string): Promise<Project[]> {
     const entities = await this.em.find(ProjectMikroOrm, {
-      organizationId,
+      organization: { id: organizationId },
       isActive: true,
       deletedAt: null,
     });

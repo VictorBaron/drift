@@ -3,8 +3,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { LlmGenerationResult } from '../../domain/gateways/llm.gateway';
 import { LlmGateway } from '../../domain/gateways/llm.gateway';
+import { AnthropicModelId, LatestModels } from './anthropic-models.types';
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL: AnthropicModelId = 'claude-sonnet-4-20250514';
 const MAX_TOKENS = 4096;
 const TEMPERATURE = 0.3;
 const MAX_ATTEMPTS = 3;
@@ -54,5 +55,9 @@ export class AnthropicLlmGateway extends LlmGateway {
 
   private isRetryable(error: unknown): boolean {
     return error instanceof Anthropic.APIError && (error.status === 429 || error.status === 500);
+  }
+
+  getLatestModel(): AnthropicModelId {
+    return LatestModels.SONNET;
   }
 }

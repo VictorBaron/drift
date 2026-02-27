@@ -1,5 +1,7 @@
 {
-  "namespaces": ["public"],
+  "namespaces": [
+    "public"
+  ],
   "name": "public",
   "tables": [
     {
@@ -43,8 +45,8 @@
           "length": 6,
           "mappedType": "datetime"
         },
-        "organization_id": {
-          "name": "organization_id",
+        "name": {
+          "name": "name",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -53,18 +55,8 @@
           "length": 255,
           "mappedType": "string"
         },
-        "project_id": {
-          "name": "project_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "linear_issue_id": {
-          "name": "linear_issue_id",
+        "slack_team_id": {
+          "name": "slack_team_id",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -73,18 +65,8 @@
           "length": 255,
           "mappedType": "string"
         },
-        "identifier": {
-          "name": "identifier",
-          "type": "varchar(50)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 50,
-          "mappedType": "string"
-        },
-        "title": {
-          "name": "title",
+        "slack_bot_token": {
+          "name": "slack_bot_token",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -92,56 +74,8 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
-        },
-        "state_name": {
-          "name": "state_name",
-          "type": "varchar(100)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 100,
-          "mappedType": "string"
-        },
-        "state_type": {
-          "name": "state_type",
-          "type": "varchar(50)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 50,
-          "mappedType": "string"
-        },
-        "priority": {
-          "name": "priority",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "assignee_name": {
-          "name": "assignee_name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "label_names": {
-          "name": "label_names",
+        "slack_user_tokens": {
+          "name": "slack_user_tokens",
           "type": "jsonb",
           "unsigned": false,
           "autoincrement": false,
@@ -149,58 +83,34 @@
           "nullable": false,
           "mappedType": "json"
         },
-        "comment_count": {
-          "name": "comment_count",
-          "type": "int",
+        "linear_access_token": {
+          "name": "linear_access_token",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "snapshot_date": {
-          "name": "snapshot_date",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "snapshot_week_start": {
-          "name": "snapshot_week_start",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
+          "nullable": true,
+          "mappedType": "text"
         }
       },
-      "name": "linear_ticket_snapshot",
+      "name": "organization",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "linear_ticket_snapshot_linear_issue_id_snapshot_date_index",
-          "columnNames": ["linear_issue_id", "snapshot_date"],
-          "composite": true,
-          "constraint": false,
+          "columnNames": [
+            "slack_team_id"
+          ],
+          "composite": false,
+          "keyName": "organization_slack_team_id_unique",
+          "constraint": true,
           "primary": false,
-          "unique": false
+          "unique": true
         },
         {
-          "keyName": "linear_ticket_snapshot_project_id_snapshot_week_start_index",
-          "columnNames": ["project_id", "snapshot_week_start"],
-          "composite": true,
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "linear_ticket_snapshot_pkey",
-          "columnNames": ["id"],
+          "keyName": "organization_pkey",
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -304,20 +214,21 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         }
       },
       "name": "member",
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["email"],
+          "columnNames": [
+            "email"
+          ],
           "composite": false,
           "keyName": "member_email_unique",
           "constraint": true,
@@ -325,16 +236,10 @@
           "unique": true
         },
         {
-          "columnNames": ["organization_id"],
-          "composite": false,
-          "keyName": "member_organization_id_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
           "keyName": "member_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -342,120 +247,20 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "uuid"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "slack_team_id": {
-          "name": "slack_team_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "slack_bot_token": {
-          "name": "slack_bot_token",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "text"
-        },
-        "slack_user_tokens": {
-          "name": "slack_user_tokens",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "json"
-        },
-        "linear_access_token": {
-          "name": "linear_access_token",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "mappedType": "text"
+      "foreignKeys": {
+        "member_organization_id_foreign": {
+          "constraintName": "member_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "public.member",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "updateRule": "cascade"
         }
       },
-      "name": "organization",
-      "schema": "public",
-      "indexes": [
-        {
-          "columnNames": ["slack_team_id"],
-          "composite": false,
-          "keyName": "organization_slack_team_id_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "organization_pkey",
-          "columnNames": ["id"],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {},
       "nativeEnums": {}
     },
     {
@@ -501,12 +306,12 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "varchar(1023)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
+          "length": 1023,
           "mappedType": "string"
         },
         "emoji": {
@@ -521,13 +326,12 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         },
         "pm_lead_name": {
           "name": "pm_lead_name",
@@ -658,16 +462,10 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["organization_id"],
-          "composite": false,
-          "keyName": "project_organization_id_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
           "keyName": "project_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -675,7 +473,20 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "project_organization_id_foreign": {
+          "constraintName": "project_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "public.project",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -719,8 +530,26 @@
           "length": 6,
           "mappedType": "datetime"
         },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
         "project_id": {
           "name": "project_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "uuid"
+        },
+        "linear_issue_id": {
+          "name": "linear_issue_id",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -728,6 +557,237 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "varchar(50)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 50,
+          "mappedType": "string"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "state_name": {
+          "name": "state_name",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "state_type": {
+          "name": "state_type",
+          "type": "varchar(50)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 50,
+          "mappedType": "string"
+        },
+        "priority": {
+          "name": "priority",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "assignee_name": {
+          "name": "assignee_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "label_names": {
+          "name": "label_names",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "comment_count": {
+          "name": "comment_count",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "snapshot_date": {
+          "name": "snapshot_date",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "snapshot_week_start": {
+          "name": "snapshot_week_start",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "linear_ticket_snapshot",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "linear_ticket_snapshot_linear_issue_id_snapshot_date_index",
+          "columnNames": [
+            "linear_issue_id",
+            "snapshot_date"
+          ],
+          "composite": true,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "linear_ticket_snapshot_project_id_snapshot_week_start_index",
+          "columnNames": [
+            "project_id",
+            "snapshot_week_start"
+          ],
+          "composite": true,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "linear_ticket_snapshot_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "linear_ticket_snapshot_organization_id_foreign": {
+          "constraintName": "linear_ticket_snapshot_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "public.linear_ticket_snapshot",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "updateRule": "cascade"
+        },
+        "linear_ticket_snapshot_project_id_foreign": {
+          "constraintName": "linear_ticket_snapshot_project_id_foreign",
+          "columnNames": [
+            "project_id"
+          ],
+          "localTableName": "public.linear_ticket_snapshot",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.project",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
         },
         "week_start": {
           "name": "week_start",
@@ -915,23 +975,20 @@
       "indexes": [
         {
           "keyName": "report_project_id_generated_at_index",
-          "columnNames": ["project_id", "generated_at"],
+          "columnNames": [
+            "project_id",
+            "generated_at"
+          ],
           "composite": true,
           "constraint": false,
           "primary": false,
           "unique": false
         },
         {
-          "keyName": "report_project_id_week_start_unique",
-          "columnNames": ["project_id", "week_start"],
-          "composite": true,
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "report_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -939,7 +996,32 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "report_organization_id_foreign": {
+          "constraintName": "report_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "public.report",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "updateRule": "cascade"
+        },
+        "report_project_id_foreign": {
+          "constraintName": "report_project_id_foreign",
+          "columnNames": [
+            "project_id"
+          ],
+          "localTableName": "public.report",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -1115,7 +1197,9 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": ["team_id"],
+          "columnNames": [
+            "team_id"
+          ],
           "composite": false,
           "keyName": "slack_installation_team_id_index",
           "constraint": false,
@@ -1123,7 +1207,9 @@
           "unique": false
         },
         {
-          "columnNames": ["enterprise_id"],
+          "columnNames": [
+            "enterprise_id"
+          ],
           "composite": false,
           "keyName": "slack_installation_enterprise_id_index",
           "constraint": false,
@@ -1131,7 +1217,9 @@
           "unique": false
         },
         {
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "composite": false,
           "keyName": "slack_installation_user_id_index",
           "constraint": false,
@@ -1140,7 +1228,10 @@
         },
         {
           "keyName": "slack_installation_team_id_enterprise_id_unique",
-          "columnNames": ["team_id", "enterprise_id"],
+          "columnNames": [
+            "team_id",
+            "enterprise_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -1148,7 +1239,9 @@
         },
         {
           "keyName": "slack_installation_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -1202,23 +1295,21 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         },
         "project_id": {
           "name": "project_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         },
         "channel_id": {
           "name": "channel_id",
@@ -1340,7 +1431,10 @@
       "indexes": [
         {
           "keyName": "slack_message_channel_id_ingested_at_index",
-          "columnNames": ["channel_id", "ingested_at"],
+          "columnNames": [
+            "channel_id",
+            "ingested_at"
+          ],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -1348,7 +1442,10 @@
         },
         {
           "keyName": "slack_message_project_id_ingested_at_index",
-          "columnNames": ["project_id", "ingested_at"],
+          "columnNames": [
+            "project_id",
+            "ingested_at"
+          ],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -1356,7 +1453,10 @@
         },
         {
           "keyName": "slack_message_channel_id_message_ts_unique",
-          "columnNames": ["channel_id", "message_ts"],
+          "columnNames": [
+            "channel_id",
+            "message_ts"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -1364,7 +1464,9 @@
         },
         {
           "keyName": "slack_message_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -1372,7 +1474,33 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "slack_message_organization_id_foreign": {
+          "constraintName": "slack_message_organization_id_foreign",
+          "columnNames": [
+            "organization_id"
+          ],
+          "localTableName": "public.slack_message",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "updateRule": "cascade"
+        },
+        "slack_message_project_id_foreign": {
+          "constraintName": "slack_message_project_id_foreign",
+          "columnNames": [
+            "project_id"
+          ],
+          "localTableName": "public.slack_message",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.project",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     }
   ],

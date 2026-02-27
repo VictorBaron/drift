@@ -1,12 +1,15 @@
+import { rel } from '@mikro-orm/postgresql';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
 import { SlackMessage } from '@/integrations/slack/domain/aggregates/slack-message.aggregate';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 import { SlackMessageMikroOrm } from '../models/slack-message.mikroORM';
 
 export class SlackMessageMapper {
   static toDomain(raw: SlackMessageMikroOrm): SlackMessage {
     return SlackMessage.reconstitute({
       id: raw.id,
-      organizationId: raw.organizationId,
-      projectId: raw.projectId,
+      organizationId: raw.organization.id,
+      projectId: raw.project?.id ?? null,
       channelId: raw.channelId,
       messageTs: raw.messageTs,
       threadTs: raw.threadTs,
@@ -29,8 +32,8 @@ export class SlackMessageMapper {
     const json = message.toJSON();
     return SlackMessageMikroOrm.build({
       id: json.id,
-      organizationId: json.organizationId,
-      projectId: json.projectId,
+      organization: rel(OrganizationMikroOrm, json.organizationId),
+      project: json.projectId ? rel(ProjectMikroOrm, json.projectId) : null,
       channelId: json.channelId,
       messageTs: json.messageTs,
       threadTs: json.threadTs,

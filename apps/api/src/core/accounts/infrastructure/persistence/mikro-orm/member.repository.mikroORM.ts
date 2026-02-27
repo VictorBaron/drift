@@ -31,7 +31,7 @@ export class MemberRepositoryMikroOrm extends RepositoryMikroORM<Member, MemberM
   }
 
   async findByOrganizationId(organizationId: string): Promise<Member[]> {
-    const entities = await this.em.find(MemberMikroOrm, { organizationId, deletedAt: null });
+    const entities = await this.em.find(MemberMikroOrm, { organization: { id: organizationId }, deletedAt: null });
     return entities.map(MemberMapper.toDomain);
   }
 }

@@ -1,5 +1,7 @@
+import { rel } from '@mikro-orm/core';
 import { Member, type MemberRole } from '@/accounts/domain/aggregates/member.aggregate';
 import { MemberMikroOrm } from '../models/member.mikroORM';
+import { OrganizationMikroOrm } from '../models/organization.mikroORM';
 
 export class MemberMapper {
   static toDomain(raw: MemberMikroOrm): Member {
@@ -10,7 +12,7 @@ export class MemberMapper {
       slackUserId: raw.slackUserId,
       avatarUrl: raw.avatarUrl,
       role: raw.role as MemberRole,
-      organizationId: raw.organizationId,
+      organizationId: raw.organization.id,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       deletedAt: raw.deletedAt,
@@ -26,7 +28,7 @@ export class MemberMapper {
       slackUserId: json.slackUserId,
       avatarUrl: json.avatarUrl,
       role: json.role,
-      organizationId: json.organizationId,
+      organization: rel(OrganizationMikroOrm, json.organizationId),
       createdAt: json.createdAt,
       updatedAt: json.updatedAt,
       deletedAt: json.deletedAt,

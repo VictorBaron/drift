@@ -7,7 +7,7 @@ import { HasNotionPageChangedQuery } from '@/integrations/notion/application/que
 import { ReadNotionPageQuery } from '@/integrations/notion/application/queries/read-notion-page/read-notion-page.query';
 import { NOTION_API_GATEWAY } from '@/integrations/notion/domain/gateways/notion-api.gateway';
 import { HttpNotionApiGateway } from '@/integrations/notion/infrastructure/gateways/http-notion-api.gateway';
-import { SlackIntegrationPersistenceModule } from '@/integrations/slack/infrastructure/persistence/slack-integration.persistence-module';
+import { SlackIntegrationModule } from '@/integrations/slack/slack-integration.module';
 import { ProjectsPersistenceModule } from '@/projects/infrastructure/persistence/projects.persistence-module';
 import { ReportsPersistenceModule } from '@/reports/infrastructure/persistence/reports.persistence-module';
 import { GenerateReportHandler } from './application/commands/generate-report/generate-report.handler';
@@ -24,8 +24,8 @@ import { AnthropicLlmGateway } from './infrastructure/gateways/anthropic-llm.gat
     AccountsPersistenceModule,
     ProjectsPersistenceModule,
     ReportsPersistenceModule,
-    SlackIntegrationPersistenceModule,
     LinearIntegrationPersistenceModule,
+    SlackIntegrationModule,
   ],
   providers: [
     PromptBuilderService,

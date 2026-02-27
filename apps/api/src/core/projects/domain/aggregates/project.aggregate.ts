@@ -166,6 +166,18 @@ export class Project extends AggregateRoot {
     return this.keyResults;
   }
 
+  getPmLeadName(): string | null {
+    return this.pmLeadName;
+  }
+
+  getTechLeadName(): string | null {
+    return this.techLeadName;
+  }
+
+  getWeekNumber(): number {
+    return this.weekNumber;
+  }
+
   getIsActive(): boolean {
     return this.isActive;
   }

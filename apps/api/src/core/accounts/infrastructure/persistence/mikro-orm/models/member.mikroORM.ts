@@ -1,6 +1,7 @@
-import { Entity, Index, Property, Unique } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
+import { OrganizationMikroOrm } from './organization.mikroORM';
 
 @Entity({ tableName: 'member' })
 export class MemberMikroOrm extends PersistenceEntity {
@@ -20,9 +21,8 @@ export class MemberMikroOrm extends PersistenceEntity {
   @Property({ type: 'varchar', length: 50 })
   role: string;
 
-  @Property({ type: 'varchar', length: 255 })
-  @Index()
-  organizationId: string;
+  @ManyToOne(() => OrganizationMikroOrm)
+  organization: OrganizationMikroOrm;
 
   static build(props: OwnPersistenceEntityProperties<MemberMikroOrm>): MemberMikroOrm {
     return Object.assign(new MemberMikroOrm(), props);

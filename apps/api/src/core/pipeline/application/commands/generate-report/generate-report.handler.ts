@@ -22,6 +22,23 @@ export interface GenerateReportResult {
   reportId: string;
 }
 
+enum ModelUsed {
+  CLAUDE_HAIKU_1_20260114 = 'claude-haiku-1-20260114',
+  CLAUDE_SONNET_4_20250514 = 'claude-sonnet-4-20250514',
+  CLAUDE_SONNET_4_20250514_1106 = 'claude-sonnet-4-20250514-1106',
+  CLAUDE_SONNET_4_20250514_1106_1 = 'claude-sonnet-4-20250514-1106-1',
+  CLAUDE_SONNET_4_20250514_1106_2 = 'claude-sonnet-4-20250514-1106-2',
+  CLAUDE_SONNET_4_20250514_1106_3 = 'claude-sonnet-4-20250514-1106-3',
+  CLAUDE_SONNET_4_20250514_1106_4 = 'claude-sonnet-4-20250514-1106-4',
+  CLAUDE_OPUS_1_20260220 = 'claude-opus-1-20260220',
+}
+
+enum LatestModels {
+  HAIKU = ModelUsed.CLAUDE_HAIKU_1_20260114,
+  SONNET = ModelUsed.CLAUDE_SONNET_4_20250514,
+  OPUS = ModelUsed.CLAUDE_OPUS_1_20260220,
+}
+
 @Injectable()
 export class GenerateReportHandler extends BaseService {
   constructor(
@@ -75,6 +92,7 @@ export class GenerateReportHandler extends BaseService {
 
     const generationTimeMs = Date.now() - start;
     const report = Report.generate({
+      organizationId: project.getOrganizationId(),
       projectId,
       weekStart,
       weekEnd,
@@ -88,7 +106,7 @@ export class GenerateReportHandler extends BaseService {
       slackMessageCount: slackMessages.length,
       linearTicketCount: linearSnapshots.length,
       notionPagesRead: notionContent ? 1 : 0,
-      modelUsed: 'claude-sonnet-4-20250514',
+      modelUsed: LatestModels.SONNET,
       promptTokens: llmResult.promptTokens,
       completionTokens: llmResult.completionTokens,
       generationTimeMs,

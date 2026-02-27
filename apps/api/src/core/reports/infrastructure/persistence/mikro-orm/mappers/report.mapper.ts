@@ -1,3 +1,6 @@
+import { rel } from '@mikro-orm/core';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 import { Report } from '@/reports/domain/aggregates/report.aggregate';
 import { ReportMikroOrm } from '../models/report.mikroORM';
 
@@ -5,7 +8,8 @@ export class ReportMapper {
   static toDomain(raw: ReportMikroOrm): Report {
     return Report.reconstitute({
       id: raw.id,
-      projectId: raw.projectId,
+      organizationId: raw.organization.id,
+      projectId: raw.project.id,
       weekStart: raw.weekStart,
       weekEnd: raw.weekEnd,
       weekNumber: raw.weekNumber,
@@ -35,7 +39,8 @@ export class ReportMapper {
     const json = report.toJSON();
     return ReportMikroOrm.build({
       id: json.id,
-      projectId: json.projectId,
+      organization: rel(OrganizationMikroOrm, json.organizationId),
+      project: rel(ProjectMikroOrm, json.projectId),
       weekStart: json.weekStart,
       weekEnd: json.weekEnd,
       weekNumber: json.weekNumber,

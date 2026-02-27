@@ -1,16 +1,18 @@
-import { Entity, Index, Property } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 
 @Entity({ tableName: 'linear_ticket_snapshot' })
-@Index({ properties: ['projectId', 'snapshotWeekStart'] })
+@Index({ properties: ['project', 'snapshotWeekStart'] })
 @Index({ properties: ['linearIssueId', 'snapshotDate'] })
 export class LinearTicketSnapshotMikroOrm extends PersistenceEntity {
-  @Property({ type: 'varchar', length: 255 })
-  organizationId: string;
+  @ManyToOne(() => OrganizationMikroOrm)
+  organization: OrganizationMikroOrm;
 
-  @Property({ type: 'varchar', length: 255, nullable: true })
-  projectId: string | null;
+  @ManyToOne(() => ProjectMikroOrm, { nullable: true })
+  project: ProjectMikroOrm | null;
 
   @Property({ type: 'varchar', length: 255 })
   linearIssueId: string;

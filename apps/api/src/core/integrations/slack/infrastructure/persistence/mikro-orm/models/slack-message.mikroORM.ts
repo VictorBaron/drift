@@ -1,17 +1,19 @@
-import { Entity, Index, Property, Unique } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 
 @Entity({ tableName: 'slack_message' })
 @Unique({ properties: ['channelId', 'messageTs'] })
-@Index({ properties: ['projectId', 'ingestedAt'] })
+@Index({ properties: ['project', 'ingestedAt'] })
 @Index({ properties: ['channelId', 'ingestedAt'] })
 export class SlackMessageMikroOrm extends PersistenceEntity {
-  @Property({ type: 'varchar', length: 255 })
-  organizationId: string;
+  @ManyToOne(() => OrganizationMikroOrm)
+  organization: OrganizationMikroOrm;
 
-  @Property({ type: 'varchar', length: 255, nullable: true })
-  projectId: string | null;
+  @ManyToOne(() => ProjectMikroOrm, { nullable: true })
+  project: ProjectMikroOrm | null;
 
   @Property({ type: 'varchar', length: 255 })
   channelId: string;

@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { AuthModule } from 'auth/auth.module';
 import { AccountsPersistenceModule } from '@/accounts/infrastructure/persistence/mikro-orm/accounts.persistence-module';
+import { DeliverPortfolioSummaryHandler } from '@/integrations/slack/application/commands/deliver-portfolio-summary/deliver-portfolio-summary.handler';
+import { DeliverReportHandler } from '@/integrations/slack/application/commands/deliver-report/deliver-report.handler';
 import { ProjectsPersistenceModule } from '@/projects/infrastructure/persistence/projects.persistence-module';
+import { ReportsPersistenceModule } from '@/reports/infrastructure/persistence/reports.persistence-module';
 import { SLACK_GATEWAY } from './domain/gateways/slack.gateway';
 import { SLACK_API_GATEWAY } from './domain/gateways/slack-api.gateway';
 import { slackIntegrationServices } from './domain/services';
@@ -19,9 +22,12 @@ import { SlackIntegrationPersistenceModule } from './infrastructure/persistence/
     ProjectsPersistenceModule,
     SlackIntegrationPersistenceModule,
     AccountsPersistenceModule,
+    ReportsPersistenceModule,
   ],
   providers: [
     ...slackIntegrationServices,
+    DeliverReportHandler,
+    DeliverPortfolioSummaryHandler,
     {
       provide: SLACK_GATEWAY,
       useClass: BoltSlackGateway,
@@ -35,6 +41,6 @@ import { SlackIntegrationPersistenceModule } from './infrastructure/persistence/
       useClass: WebApiSlackGateway,
     },
   ],
-  exports: [],
+  exports: [DeliverReportHandler, DeliverPortfolioSummaryHandler, SlackIntegrationPersistenceModule],
 })
 export class SlackIntegrationModule {}

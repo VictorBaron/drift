@@ -21,14 +21,14 @@ export class ReportRepositoryMikroOrm extends RepositoryMikroORM<Report, ReportM
   }
 
   async findByProjectAndWeek(projectId: string, weekStart: Date): Promise<Report | null> {
-    const entity = await this.em.findOne(ReportMikroOrm, { projectId, weekStart });
+    const entity = await this.em.findOne(ReportMikroOrm, { project: { id: projectId }, weekStart });
     return entity ? ReportMapper.toDomain(entity) : null;
   }
 
   async findByProjectId(projectId: string): Promise<Report[]> {
     const entities = await this.em.find(
       ReportMikroOrm,
-      { projectId, deletedAt: null },
+      { project: { id: projectId }, deletedAt: null },
       {
         orderBy: { weekStart: 'DESC' },
       },

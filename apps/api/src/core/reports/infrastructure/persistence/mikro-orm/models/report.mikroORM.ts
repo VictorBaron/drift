@@ -1,15 +1,18 @@
-import { Entity, Index, Property, Unique } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
-
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 import type { DriftLevel, ProjectHealth, ReportContent } from '@/reports/domain/aggregates/report.aggregate';
 
 @Entity({ tableName: 'report' })
-@Unique({ properties: ['projectId', 'weekStart'] })
-@Index({ properties: ['projectId', 'generatedAt'] })
+@Index({ properties: ['project', 'generatedAt'] })
 export class ReportMikroOrm extends PersistenceEntity {
-  @Property({ type: 'varchar', length: 255 })
-  projectId: string;
+  @ManyToOne(() => OrganizationMikroOrm)
+  organization: OrganizationMikroOrm;
+
+  @ManyToOne(() => OrganizationMikroOrm)
+  project: ProjectMikroOrm;
 
   @Property({ type: 'timestamptz' })
   weekStart: Date;

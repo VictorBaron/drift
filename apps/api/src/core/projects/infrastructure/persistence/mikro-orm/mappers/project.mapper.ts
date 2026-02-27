@@ -1,3 +1,5 @@
+import { rel } from '@mikro-orm/core';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models';
 import { Project } from '@/projects/domain/aggregates/project.aggregate';
 import { ProjectMikroOrm } from '../models/project.mikroORM';
 
@@ -7,7 +9,7 @@ export class ProjectMapper {
       id: raw.id,
       name: raw.name,
       emoji: raw.emoji,
-      organizationId: raw.organizationId,
+      organizationId: raw.organization.id,
       pmLeadName: raw.pmLeadName,
       techLeadName: raw.techLeadName,
       teamName: raw.teamName,
@@ -33,7 +35,7 @@ export class ProjectMapper {
       id: json.id,
       name: json.name,
       emoji: json.emoji,
-      organizationId: json.organizationId,
+      organization: rel(OrganizationMikroOrm, json.organizationId),
       pmLeadName: json.pmLeadName,
       techLeadName: json.techLeadName,
       teamName: json.teamName,

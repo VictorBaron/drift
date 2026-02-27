@@ -16,6 +16,7 @@ export class FakeSlackApiGateway extends SlackApiGateway {
   private users: Map<string, SlackApiUser> = new Map();
   private postedMessages: SlackApiPostedMessage[] = [];
   private throwingChannels: Set<string> = new Set();
+  private throwingDMs: Set<string> = new Set();
 
   seedChannelMessages(channelId: string, messages: SlackApiMessage[]): void {
     this.channelMessages.set(channelId, messages);
@@ -41,6 +42,10 @@ export class FakeSlackApiGateway extends SlackApiGateway {
     this.throwingChannels.add(channelId);
   }
 
+  throwForDM(userId: string): void {
+    this.throwingDMs.add(userId);
+  }
+
   clear(): void {
     this.channelMessages.clear();
     this.threadReplies.clear();
@@ -48,6 +53,7 @@ export class FakeSlackApiGateway extends SlackApiGateway {
     this.users.clear();
     this.postedMessages = [];
     this.throwingChannels.clear();
+    this.throwingDMs.clear();
   }
 
   async getChannelHistory(
@@ -95,6 +101,9 @@ export class FakeSlackApiGateway extends SlackApiGateway {
   }
 
   async postDM(_token: string, userId: string, blocks: unknown[]): Promise<SlackApiPostedMessage> {
+    if (this.throwingDMs.has(userId)) {
+      throw new Error(`Simulated DM failure for user ${userId}`);
+    }
     return this.postMessage(_token, `dm_${userId}`, blocks);
   }
 }

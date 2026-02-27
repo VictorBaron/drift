@@ -1,12 +1,15 @@
+import { rel } from '@mikro-orm/postgresql';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
 import { LinearTicketSnapshot } from '@/integrations/linear/domain/aggregates/linear-ticket-snapshot.aggregate';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
 import { LinearTicketSnapshotMikroOrm } from '../models/linear-ticket-snapshot.mikroORM';
 
 export class LinearTicketSnapshotMapper {
   static toDomain(raw: LinearTicketSnapshotMikroOrm): LinearTicketSnapshot {
     return LinearTicketSnapshot.reconstitute({
       id: raw.id,
-      organizationId: raw.organizationId,
-      projectId: raw.projectId,
+      organizationId: raw.organization.id,
+      projectId: raw.project?.id ?? null,
       linearIssueId: raw.linearIssueId,
       identifier: raw.identifier,
       title: raw.title,
@@ -29,8 +32,8 @@ export class LinearTicketSnapshotMapper {
     const json = snapshot.toJSON();
     return LinearTicketSnapshotMikroOrm.build({
       id: json.id,
-      organizationId: json.organizationId,
-      projectId: json.projectId,
+      organization: rel(OrganizationMikroOrm, json.organizationId),
+      project: json.projectId ? rel(ProjectMikroOrm, json.projectId) : null,
       linearIssueId: json.linearIssueId,
       identifier: json.identifier,
       title: json.title,

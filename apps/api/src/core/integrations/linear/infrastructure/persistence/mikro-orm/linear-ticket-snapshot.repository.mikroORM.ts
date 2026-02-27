@@ -20,7 +20,7 @@ export class LinearTicketSnapshotRepositoryMikroOrm
 
   async findByProjectAndWeek(projectId: string, weekStart: Date): Promise<LinearTicketSnapshot[]> {
     const entities = await this.em.find(LinearTicketSnapshotMikroOrm, {
-      projectId,
+      project: { id: projectId },
       snapshotWeekStart: weekStart,
     });
     return entities.map(LinearTicketSnapshotMapper.toDomain);
@@ -29,7 +29,7 @@ export class LinearTicketSnapshotRepositoryMikroOrm
   async findLatestByProjectId(projectId: string): Promise<LinearTicketSnapshot | null> {
     const entity = await this.em.findOne(
       LinearTicketSnapshotMikroOrm,
-      { projectId },
+      { project: { id: projectId } },
       { orderBy: { snapshotDate: 'DESC' } },
     );
     return entity ? LinearTicketSnapshotMapper.toDomain(entity) : null;

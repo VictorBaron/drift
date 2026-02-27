@@ -1,20 +1,19 @@
-import { Entity, Index, Property } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
-
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
 import type { KeyResult } from '@/projects/domain/aggregates/project.aggregate';
 
 @Entity({ tableName: 'project' })
 export class ProjectMikroOrm extends PersistenceEntity {
-  @Property({ type: 'varchar', length: 255 })
+  @Property({ type: 'varchar', length: 1023 })
   name: string;
 
   @Property({ type: 'varchar', length: 10 })
   emoji: string;
 
-  @Property({ type: 'varchar', length: 255 })
-  @Index()
-  organizationId: string;
+  @ManyToOne(() => OrganizationMikroOrm)
+  organization: OrganizationMikroOrm;
 
   @Property({ type: 'varchar', length: 255, nullable: true })
   pmLeadName: string | null;
