@@ -1,5 +1,5 @@
 export type Project = {
-  id: number;
+  id: string;
   name: string;
   emoji: string;
   health: Health;

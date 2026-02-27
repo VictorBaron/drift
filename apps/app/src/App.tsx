@@ -3,10 +3,10 @@ import { ProjectCard } from './components/ProjectCard';
 import { PROJECTS } from './fake/projects';
 
 export default function PulseDashboard() {
-  const [expanded, setExpanded] = useState(new Set([1]));
+  const [expanded, setExpanded] = useState(new Set(['1']));
   const [viewMode, setViewMode] = useState('all');
 
-  const toggleProject = (id: number) => {
+  const toggleProject = (id: string) => {
     setExpanded((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);

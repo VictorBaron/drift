@@ -2,7 +2,7 @@ import { Project } from '../types';
 
 export const PROJECTS: Project[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Checkout Revamp',
     emoji: '💳',
     health: 'on-track',
@@ -86,7 +86,7 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    id: 2,
+    id: '2',
     name: 'Search Rewrite',
     emoji: '🔍',
     health: 'at-risk',
@@ -169,7 +169,7 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    id: 3,
+    id: '3',
     name: 'Onboarding V2',
     emoji: '🚀',
     health: 'on-track',
