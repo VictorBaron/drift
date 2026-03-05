@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Inject, Param, Patch, Post } from '@nestjs/common';
 import { CurrentUser, type JwtPayload } from 'auth/current-user.decorator';
+import { TokenEncryption } from 'auth/token-encryption';
 import { OrganizationRepository } from '@/accounts/domain/repositories/organization.repository';
 import { SLACK_API_GATEWAY, SlackApiGateway } from '@/integrations/slack/domain/gateways/slack-api.gateway';
 import {
@@ -43,6 +44,7 @@ export class ProjectsController {
     private readonly createProjectHandler: CreateProjectHandler,
     private readonly updateProjectSourcesHandler: UpdateProjectSourcesHandler,
     private readonly orgRepo: OrganizationRepository,
+    private readonly tokenEncryption: TokenEncryption,
     @Inject(SLACK_API_GATEWAY) private readonly slackApi: SlackApiGateway,
   ) {}
 
@@ -97,7 +99,7 @@ export class ProjectsController {
   async getChannels(@CurrentUser() user: JwtPayload) {
     const org = await this.orgRepo.findById(user.orgId);
     if (!org) return [];
-    const channels = await this.slackApi.listChannels(org.getSlackBotToken());
+    const channels = await this.slackApi.listChannels(this.tokenEncryption.decrypt(org.getSlackBotToken()));
     return channels;
   }
 }

@@ -1,6 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { AuthModule } from 'auth/auth.module';
 import { AccountsPersistenceModule } from '@/accounts/infrastructure/persistence/mikro-orm/accounts.persistence-module';
 import { SLACK_API_GATEWAY } from '@/integrations/slack/domain/gateways/slack-api.gateway';
 import { WebApiSlackGateway } from '@/integrations/slack/infrastructure/gateways/web-api-slack.gateway';
@@ -12,7 +13,7 @@ import { ProjectMikroOrm } from './infrastructure/persistence/mikro-orm/models/p
 import { ProjectRepositoryMikroOrm } from './infrastructure/persistence/mikro-orm/project.repository.mikroORM';
 
 @Module({
-  imports: [CqrsModule, MikroOrmModule.forFeature([ProjectMikroOrm]), AccountsPersistenceModule],
+  imports: [CqrsModule, MikroOrmModule.forFeature([ProjectMikroOrm]), AccountsPersistenceModule, AuthModule],
   controllers: [ProjectsController],
   providers: [
     CreateProjectHandler,
