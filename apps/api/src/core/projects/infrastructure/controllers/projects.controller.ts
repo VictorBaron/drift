@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Patch, Post } from '@nestjs/common';
 import { CurrentUser, type JwtPayload } from 'auth/current-user.decorator';
 import { OrganizationRepository } from '@/accounts/domain/repositories/organization.repository';
 import { SLACK_API_GATEWAY, SlackApiGateway } from '@/integrations/slack/domain/gateways/slack-api.gateway';
@@ -6,8 +6,19 @@ import {
   CreateProjectCommand,
   CreateProjectHandler,
 } from '@/projects/application/commands/create-project/create-project.handler';
+import {
+  UpdateProjectSourcesCommand,
+  UpdateProjectSourcesHandler,
+} from '@/projects/application/commands/update-project-sources/update-project-sources.handler';
 import type { KeyResult } from '@/projects/domain/aggregates/project.aggregate';
 import { ProjectRepository } from '@/projects/domain/repositories/project.repository';
+
+interface UpdateProjectSourcesBody {
+  slackChannelIds: string[];
+  linearTeamId?: string | null;
+  linearProjectId?: string | null;
+  notionPageId?: string | null;
+}
 
 interface CreateProjectBody {
   name: string;
@@ -30,6 +41,7 @@ export class ProjectsController {
   constructor(
     private readonly projectRepo: ProjectRepository,
     private readonly createProjectHandler: CreateProjectHandler,
+    private readonly updateProjectSourcesHandler: UpdateProjectSourcesHandler,
     private readonly orgRepo: OrganizationRepository,
     @Inject(SLACK_API_GATEWAY) private readonly slackApi: SlackApiGateway,
   ) {}
@@ -61,6 +73,24 @@ export class ProjectsController {
       ),
     );
     return project.toJSON();
+  }
+
+  @Patch(':id/sources')
+  async updateSources(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() body: UpdateProjectSourcesBody,
+  ) {
+    await this.updateProjectSourcesHandler.execute(
+      new UpdateProjectSourcesCommand(
+        id,
+        user.orgId,
+        body.slackChannelIds ?? [],
+        body.linearTeamId ?? null,
+        body.linearProjectId ?? null,
+        body.notionPageId ?? null,
+      ),
+    );
   }
 
   @Get('channels')

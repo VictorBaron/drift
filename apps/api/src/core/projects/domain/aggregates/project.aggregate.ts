@@ -207,6 +207,19 @@ export class Project extends AggregateRoot {
     this.updatedAt = new Date();
   }
 
+  updateSources(
+    slackChannelIds: string[],
+    linearTeamId: string | null,
+    linearProjectId: string | null,
+    notionPageId: string | null,
+  ): void {
+    this.slackChannelIds = slackChannelIds;
+    this.linearTeamId = linearTeamId;
+    this.linearProjectId = linearProjectId;
+    this.notionPageId = notionPageId;
+    this.updatedAt = new Date();
+  }
+
   deactivate(): void {
     this.isActive = false;
     this.updatedAt = new Date();

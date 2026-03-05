@@ -4,6 +4,7 @@ import { api } from '@/common/services/api';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { OnboardingPage } from '@/pages/OnboardingPage';
+import { ProjectSetupPage } from '@/pages/ProjectSetupPage';
 
 function ProtectedRoute() {
   const { data, isLoading } = useQuery({
@@ -44,6 +45,7 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/projects/:projectId/setup" element={<ProjectSetupPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

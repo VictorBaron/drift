@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Project } from '../types';
 import { DriftBadge } from './DriftBadge';
 import { HealthBadge } from './HealthBadge';
@@ -18,6 +19,7 @@ export function ProjectCard({
   onToggle: () => void;
 }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
   return (
     <div
@@ -115,6 +117,25 @@ export function ProjectCard({
             <SourceTag type="linear" count={project.sources.linear} />
             <SourceTag type="notion" count={project.sources.notion} />
           </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/projects/${project.id}/setup`);
+            }}
+            title="Configure sources"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 12,
+              color: '#A09B94',
+              padding: '2px 4px',
+              fontFamily: 'inherit',
+            }}
+          >
+            ⚙ sources
+          </button>
         </div>
         <span
           style={{

@@ -5,6 +5,7 @@ import { AccountsPersistenceModule } from '@/accounts/infrastructure/persistence
 import { SLACK_API_GATEWAY } from '@/integrations/slack/domain/gateways/slack-api.gateway';
 import { WebApiSlackGateway } from '@/integrations/slack/infrastructure/gateways/web-api-slack.gateway';
 import { CreateProjectHandler } from './application/commands/create-project/create-project.handler';
+import { UpdateProjectSourcesHandler } from './application/commands/update-project-sources/update-project-sources.handler';
 import { ProjectRepository } from './domain/repositories/project.repository';
 import { ProjectsController } from './infrastructure/controllers/projects.controller';
 import { ProjectMikroOrm } from './infrastructure/persistence/mikro-orm/models/project.mikroORM';
@@ -15,6 +16,7 @@ import { ProjectRepositoryMikroOrm } from './infrastructure/persistence/mikro-or
   controllers: [ProjectsController],
   providers: [
     CreateProjectHandler,
+    UpdateProjectSourcesHandler,
     { provide: ProjectRepository, useClass: ProjectRepositoryMikroOrm },
     { provide: SLACK_API_GATEWAY, useClass: WebApiSlackGateway },
   ],

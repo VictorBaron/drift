@@ -64,6 +64,13 @@ export interface ExtractObjectiveResult {
   keyResults: { text: string; done: boolean }[];
 }
 
+export interface UpdateProjectSourcesPayload {
+  slackChannelIds: string[];
+  linearTeamId?: string | null;
+  linearProjectId?: string | null;
+  notionPageId?: string | null;
+}
+
 export interface CreateProjectPayload {
   name: string;
   emoji: string;
@@ -107,6 +114,12 @@ export const api = {
   createProject: (payload: CreateProjectPayload) =>
     request<ProjectJSON>('/projects', {
       method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateProjectSources: (projectId: string, payload: UpdateProjectSourcesPayload) =>
+    request<void>(`/projects/${projectId}/sources`, {
+      method: 'PATCH',
       body: JSON.stringify(payload),
     }),
 };
