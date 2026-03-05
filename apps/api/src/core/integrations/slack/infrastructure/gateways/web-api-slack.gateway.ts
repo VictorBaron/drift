@@ -169,6 +169,15 @@ export class WebApiSlackGateway extends SlackApiGateway {
     return this.postMessage(token, channelId, blocks);
   }
 
+  async publishAppHome(token: string, userId: string, view: unknown): Promise<void> {
+    const client = this.buildClient(token);
+    await client.views.publish({
+      user_id: userId,
+      // biome-ignore lint/suspicious/noExplicitAny: Slack view type
+      view: view as any,
+    });
+  }
+
   // biome-ignore lint/suspicious/noExplicitAny: Slack API message type is complex
   private mapMessage(msg: Record<string, any>): SlackApiMessage {
     const reactions: { count: number }[] = msg.reactions ?? [];

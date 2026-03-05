@@ -24,21 +24,29 @@ Drift is an app that aggregates data from different sources — Linear, Notion, 
 
 ```
 apps/
-  api/                  # NestJS backend
+  api/                      # NestJS backend
     src/
-      auth/               # Slack OAuth + Google OAuth flows
+      auth/                 # Slack OAuth + Google OAuth flows
+      common/               # Shared utilities, decorators, guards
       core/
         accounts/           # Account & Member entities, customer accounts information
         ai/                 # AI integration
-        projects/           # Project information + status report
         integrations/       # Slack, Notion, Linear integrations
-        users/              # User entity, preferences, activity tracking
+        pipeline/           # Report generation
+        projects/           # Project information + status report
+        reports/            # Project status report
+        scheduler/          # Crons for Slack and Notion extraction
+      database/             # Db seed
+      health/               # Health checks
       app.module.ts
       main.ts
-      common/             # Shared utilities, decorators, guards
-  app/                  # React Web app
-    main.js             # Electron main process entry point
-    index.html          # Renderer entry point
+  app/                      # React Web app
+    src/                    
+      common/               # Utils - routes, services, types
+      components/           # Reusable jsx components
+      fake/                 # Fake data to inject
+      features/             # App features 
+      pages/                # App pages 
 ```
 
 ### Database / MikroORM

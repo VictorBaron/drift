@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { api } from '@/common/services/api';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { LoginPage } from '@/pages/LoginPage';
-import { api } from '@/services/api';
+import { OnboardingPage } from '@/pages/OnboardingPage';
 
 function ProtectedRoute() {
   const { data, isLoading } = useQuery({
@@ -42,6 +43,7 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

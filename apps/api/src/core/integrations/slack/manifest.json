@@ -11,21 +11,21 @@
     }
   },
   "oauth_config": {
-    "redirect_urls": ["https://localhost:3000/slack/oauth/callback"],
+    "redirect_urls": [
+      "https://localhost:3000/slack/oauth/callback",
+      "https://96f2-92-173-34-235.ngrok-free.app/slack/oauth/callback"
+    ],
     "scopes": {
-      "bot": ["chat:write", "im:write", "users:read"],
-      "user": [
+      "bot": [
+        "channels:read",
         "channels:history",
         "groups:history",
-        "im:history",
-        "mpim:history",
-        "channels:read",
         "groups:read",
-        "im:read",
-        "mpim:read",
         "users:read",
-        "reactions:read"
-      ]
+        "users:read.email",
+        "chat:write"
+      ],
+      "user": ["groups:read", "groups:history", "channels:read", "channels:history"]
     }
   },
   "settings": {

@@ -50,4 +50,6 @@ export abstract class SlackApiGateway {
   abstract postMessage(token: string, channelId: string, blocks: unknown[]): Promise<SlackApiPostedMessage>;
 
   abstract postDM(token: string, userId: string, blocks: unknown[]): Promise<SlackApiPostedMessage>;
+
+  abstract publishAppHome(token: string, userId: string, view: unknown): Promise<void>;
 }

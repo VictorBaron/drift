@@ -11,6 +11,10 @@ import { SlackGateway } from '@/integrations/slack/domain/gateways/slack.gateway
 import { INSTALLATION_STORE } from '@/integrations/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/integrations/slack/types';
 import {
+  PublishAppHomeCommand,
+  PublishAppHomeHandler,
+} from '../../application/commands/publish-app-home/publish-app-home.handler';
+import {
   RegisterSlackInstallationCommand,
   RegisterSlackInstallationResult,
 } from '../../application/commands/register-slack-installation/register-slack-installation.handler';
@@ -23,10 +27,9 @@ const SLACK_SCOPES = [
   'users:read',
   'users:read.email',
   'chat:write',
-  'im:write',
 ] as const;
 
-const USER_SCOPES = ['identity.basic', 'identity.email'] as const;
+const USER_SCOPES = ['groups:read', 'groups:history', 'channels:read', 'channels:history'] as const;
 
 @Injectable()
 export class BoltSlackGateway implements SlackGateway, OnModuleInit {
@@ -41,6 +44,7 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
     private commandBus: CommandBus,
     private jwtService: JwtService,
     private tokenEncryption: TokenEncryption,
+    private publishAppHome: PublishAppHomeHandler,
   ) {
     this.receiver = new ExpressReceiver({
       signingSecret: this.config.getOrThrow('SLACK_SIGNING_SECRET'),
@@ -53,6 +57,8 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
         userScopes: [...USER_SCOPES],
         installPath: '/install',
         redirectUriPath: '/oauth/callback',
+        directInstall: true,
+        legacyStateVerification: false,
         callbackOptions: {
           success: this.handleOAuthSuccess.bind(this),
         },
@@ -122,7 +128,7 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
       const cookieFlags = `HttpOnly; Path=/; SameSite=Lax${isProduction ? '; Secure' : ''}`;
 
       res.setHeader('Set-Cookie', `session=${token}; ${cookieFlags}`);
-      res.writeHead(302, { Location: `${webUrl}/dashboard` });
+      res.writeHead(302, { Location: `${webUrl}/dashboard?token=${token}` });
       res.end();
     } catch (error) {
       this.logger.error('OAuth success handler failed', error);
@@ -143,6 +149,13 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
 
     this.bolt.event('reaction_added', async ({ event }) => {
       return;
+    });
+
+    this.bolt.event('app_home_opened', async ({ event, context }) => {
+      if (event.tab !== 'home') return;
+
+      const teamId = context.teamId ?? '';
+      await this.publishAppHome.execute(new PublishAppHomeCommand(event.user, teamId));
     });
   }
 }

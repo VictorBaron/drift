@@ -106,4 +106,8 @@ export class FakeSlackApiGateway extends SlackApiGateway {
     }
     return this.postMessage(_token, `dm_${userId}`, blocks);
   }
+
+  async publishAppHome(_token: string, _userId: string, _view: unknown): Promise<void> {
+    // no-op in tests
+  }
 }

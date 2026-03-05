@@ -21,7 +21,10 @@ export class JwtAuthGuard implements CanActivate {
     if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest<Request>();
-    const token = request.cookies['session'] as string | undefined;
+    const cookieToken = request.cookies['session'] as string | undefined;
+    const authHeader = request.headers['authorization'] as string | undefined;
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+    const token = cookieToken ?? bearerToken;
 
     if (!token) {
       this.logger.warn(`Missing session cookie — ${request.method} ${request.path} ip=${request.ip}`);

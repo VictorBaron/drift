@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { api } from '@/services/api';
+import { api } from '@/common/services/api';
+import type { ProjectJSON, ReportJSON } from '@/common/types/api';
 import type { Project } from '@/types';
-import type { ProjectJSON, ReportJSON } from '@/types/api';
 
 function computeDaysToTarget(targetDate: string | null): number {
   if (!targetDate) return 0;

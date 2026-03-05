@@ -22,7 +22,7 @@ FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY . .
-RUN pnpm --filter shoulder-tap build
+RUN pnpm --filter drift build
 
 # Production stage
 FROM base AS prod

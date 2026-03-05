@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/services/api';
+import { api } from '@/common/services/api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 export function LoginPage() {
   const navigate = useNavigate();

@@ -4,6 +4,8 @@ import { AuthModule } from 'auth/auth.module';
 import { AccountsPersistenceModule } from '@/accounts/infrastructure/persistence/mikro-orm/accounts.persistence-module';
 import { DeliverPortfolioSummaryHandler } from '@/integrations/slack/application/commands/deliver-portfolio-summary/deliver-portfolio-summary.handler';
 import { DeliverReportHandler } from '@/integrations/slack/application/commands/deliver-report/deliver-report.handler';
+import { PublishAppHomeHandler } from '@/integrations/slack/application/commands/publish-app-home/publish-app-home.handler';
+import { AppHomeBuilderService } from '@/integrations/slack/domain/services/app-home-builder/app-home-builder.service';
 import { ProjectsPersistenceModule } from '@/projects/infrastructure/persistence/projects.persistence-module';
 import { ReportsPersistenceModule } from '@/reports/infrastructure/persistence/reports.persistence-module';
 import { SLACK_GATEWAY } from './domain/gateways/slack.gateway';
@@ -28,6 +30,8 @@ import { SlackIntegrationPersistenceModule } from './infrastructure/persistence/
     ...slackIntegrationServices,
     DeliverReportHandler,
     DeliverPortfolioSummaryHandler,
+    PublishAppHomeHandler,
+    AppHomeBuilderService,
     {
       provide: SLACK_GATEWAY,
       useClass: BoltSlackGateway,

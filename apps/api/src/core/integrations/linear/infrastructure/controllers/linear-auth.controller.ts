@@ -1,10 +1,11 @@
-import { Controller, Get, NotFoundException, Query, Redirect } from '@nestjs/common';
+import { Controller, Get, Inject, NotFoundException, Query, Redirect } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CurrentUser, type JwtPayload } from 'auth/current-user.decorator';
 import { Public } from 'auth/public.decorator';
 import { TokenEncryption } from 'auth/token-encryption';
 
 import { OrganizationRepository } from '@/accounts/domain/repositories/organization.repository';
+import { LINEAR_API_GATEWAY, LinearApiGateway } from '@/integrations/linear/domain/gateways/linear-api.gateway';
 
 @Controller('integrations/linear')
 export class LinearAuthController {
@@ -12,7 +13,24 @@ export class LinearAuthController {
     private readonly config: ConfigService,
     private readonly orgRepo: OrganizationRepository,
     private readonly tokenEncryption: TokenEncryption,
+    @Inject(LINEAR_API_GATEWAY) private readonly linearApi: LinearApiGateway,
   ) {}
+
+  @Get('teams')
+  async listTeams(@CurrentUser() user: JwtPayload) {
+    const org = await this.orgRepo.findById(user.orgId);
+    if (!org?.getLinearAccessToken()) return { connected: false, teams: [] };
+
+    const decryptedToken = this.tokenEncryption.decrypt(org.getLinearAccessToken()!);
+    const teams = await this.linearApi.listTeams(decryptedToken);
+    const teamsWithProjects = await Promise.all(
+      teams.map(async (team) => {
+        const projects = await this.linearApi.listProjects(decryptedToken, team.id);
+        return { ...team, projects };
+      }),
+    );
+    return { connected: true, teams: teamsWithProjects };
+  }
 
   @Get('connect')
   @Redirect()
