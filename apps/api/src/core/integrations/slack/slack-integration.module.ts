@@ -8,6 +8,7 @@ import { PublishAppHomeHandler } from '@/integrations/slack/application/commands
 import { AppHomeBuilderService } from '@/integrations/slack/domain/services/app-home-builder/app-home-builder.service';
 import { ProjectsPersistenceModule } from '@/projects/infrastructure/persistence/projects.persistence-module';
 import { ReportsPersistenceModule } from '@/reports/infrastructure/persistence/reports.persistence-module';
+import { RegisterSlackInstallationHandler } from './application/commands/register-slack-installation/register-slack-installation.handler';
 import { SLACK_GATEWAY } from './domain/gateways/slack.gateway';
 import { SLACK_API_GATEWAY } from './domain/gateways/slack-api.gateway';
 import { slackIntegrationServices } from './domain/services';
@@ -32,6 +33,7 @@ import { SlackIntegrationPersistenceModule } from './infrastructure/persistence/
     DeliverPortfolioSummaryHandler,
     PublishAppHomeHandler,
     AppHomeBuilderService,
+    RegisterSlackInstallationHandler,
     {
       provide: SLACK_GATEWAY,
       useClass: BoltSlackGateway,

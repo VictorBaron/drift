@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Member } from '@/accounts/domain/aggregates/member.aggregate';
 import { Organization } from '@/accounts/domain/aggregates/organization.aggregate';
 import { MemberRepository } from '@/accounts/domain/repositories/member.repository';
@@ -23,7 +24,8 @@ export interface RegisterSlackInstallationResult {
 }
 
 @Injectable()
-export class RegisterSlackInstallationHandler {
+@CommandHandler(RegisterSlackInstallationCommand)
+export class RegisterSlackInstallationHandler implements ICommandHandler<RegisterSlackInstallationCommand> {
   constructor(
     private readonly orgRepo: OrganizationRepository,
     private readonly memberRepo: MemberRepository,
