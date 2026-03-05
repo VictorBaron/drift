@@ -1,4 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '@/common/services/api';
 import { ProjectCard } from '@/components/ProjectCard';
 import { useLatestReports } from '@/features/reports/hooks/useLatestReports';
 import type { Project } from '@/types';
@@ -45,8 +48,10 @@ function DashboardSkeleton() {
 export function DashboardPage() {
   const [expanded, setExpanded] = useState(new Set<string>());
   const [viewMode, setViewMode] = useState<ViewMode>('all');
+  const navigate = useNavigate();
 
   const { data: projects, isLoading, error } = useLatestReports();
+  const { data: rawProjects } = useQuery({ queryKey: ['projects'], queryFn: api.getProjects });
 
   const toggleProject = (id: string) => {
     setExpanded((prev) => {
@@ -107,7 +112,25 @@ export function DashboardPage() {
             BETA
           </span>
         </div>
-        <span style={{ fontSize: 12, color: '#666' }}>Last sync: just now</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 12, color: '#666' }}>Last sync: just now</span>
+          <button
+            onClick={() => navigate('/onboarding')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 6,
+              border: '1px solid #333',
+              background: 'transparent',
+              color: '#FFF',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+            }}
+          >
+            + New project
+          </button>
+        </div>
       </div>
 
       {isLoading && <DashboardSkeleton />}
@@ -129,7 +152,54 @@ export function DashboardPage() {
         </div>
       )}
 
-      {!isLoading && !error && (
+      {!isLoading && !error && rawProjects?.length === 0 && (
+        <div style={{ maxWidth: 920, margin: '0 auto', padding: '80px 24px' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '64px 48px',
+              background: '#FFF',
+              borderRadius: 16,
+              border: '1px solid #E8E6E1',
+            }}
+          >
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+            <h2
+              style={{
+                fontFamily: "'Newsreader', Georgia, serif",
+                fontSize: 26,
+                fontWeight: 400,
+                color: '#1A1A1A',
+                margin: '0 0 8px',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              No projects yet
+            </h2>
+            <p style={{ fontSize: 14, color: '#6B6560', margin: '0 0 28px', lineHeight: 1.6 }}>
+              Set up your first project to start tracking delivery, decisions, and drift.
+            </p>
+            <button
+              onClick={() => navigate('/onboarding')}
+              style={{
+                padding: '11px 28px',
+                borderRadius: 8,
+                border: 'none',
+                background: '#1A1A1A',
+                color: '#FFF',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              Set up a project →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !error && (rawProjects === undefined || rawProjects.length > 0) && (
         <div style={{ maxWidth: 920, margin: '0 auto', padding: '32px 24px' }}>
           {/* Header */}
           <div style={{ marginBottom: 28 }}>
