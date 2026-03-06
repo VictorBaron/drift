@@ -95,7 +95,7 @@ export function LoginPage() {
         </p>
 
         <a
-          href={`${API_BASE}/auth/slack`}
+          href={`${API_BASE}/auth/slack/signin`}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -131,10 +131,15 @@ export function LoginPage() {
               fill="#ECB22E"
             />
           </svg>
-          Add to Slack
+          Sign in with Slack
         </a>
 
-        <p style={{ fontSize: 12, color: '#A09B94', marginTop: 20 }}>Requires Slack workspace admin permissions</p>
+        <p style={{ fontSize: 12, color: '#A09B94', marginTop: 20 }}>
+          New to Drift?{' '}
+          <a href={`${API_BASE}/auth/slack`} style={{ color: '#6B6560', textDecoration: 'underline' }}>
+            Add Drift to your Slack workspace
+          </a>
+        </p>
       </div>
     </div>
   );

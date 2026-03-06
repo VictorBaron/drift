@@ -13,6 +13,11 @@ export class FakeLinearApiGateway extends LinearApiGateway {
   private projects: LinearProject[] = [];
   private projectIssues: Map<string, LinearIssue[]> = new Map();
   private teamIssues: Map<string, LinearIssue[]> = new Map();
+  private exchangedToken = 'fake-linear-token';
+
+  seedExchangedToken(token: string): void {
+    this.exchangedToken = token;
+  }
 
   seedTeams(teams: LinearTeam[]): void {
     this.teams = teams;
@@ -35,6 +40,11 @@ export class FakeLinearApiGateway extends LinearApiGateway {
     this.projects = [];
     this.projectIssues.clear();
     this.teamIssues.clear();
+    this.exchangedToken = 'fake-linear-token';
+  }
+
+  async exchangeToken(_code: string, _redirectUri: string): Promise<string> {
+    return this.exchangedToken;
   }
 
   async listTeams(_token: string): Promise<LinearTeam[]> {

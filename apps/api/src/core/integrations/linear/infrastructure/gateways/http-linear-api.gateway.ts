@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import {
   LinearApiGateway,
@@ -8,6 +9,7 @@ import {
 } from '../../domain/gateways/linear-api.gateway';
 
 const LINEAR_API_URL = 'https://api.linear.app/graphql';
+const LINEAR_TOKEN_URL = 'https://api.linear.app/oauth/token';
 const MAX_DESCRIPTION_LENGTH = 200;
 
 interface GraphQLResponse<T> {
@@ -18,6 +20,31 @@ interface GraphQLResponse<T> {
 @Injectable()
 export class HttpLinearApiGateway extends LinearApiGateway {
   private readonly logger = new Logger(HttpLinearApiGateway.name);
+
+  constructor(private readonly config: ConfigService) {
+    super();
+  }
+
+  async exchangeToken(code: string, redirectUri: string): Promise<string> {
+    const clientId = this.config.getOrThrow('LINEAR_CLIENT_ID');
+    const clientSecret = this.config.getOrThrow('LINEAR_CLIENT_SECRET');
+
+    const response = await fetch(LINEAR_TOKEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        client_secret: clientSecret,
+      }).toString(),
+    });
+
+    if (!response.ok) throw new Error(`Linear token exchange failed: ${response.statusText}`);
+    const data = (await response.json()) as { access_token: string };
+    return data.access_token;
+  }
 
   async listTeams(token: string): Promise<LinearTeam[]> {
     const query = `query { teams { nodes { id name key } } }`;

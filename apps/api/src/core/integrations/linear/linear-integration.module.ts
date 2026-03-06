@@ -3,7 +3,9 @@ import { AuthModule } from 'auth/auth.module';
 
 import { AccountsPersistenceModule } from '@/accounts/infrastructure/persistence/mikro-orm/accounts.persistence-module';
 import { ProjectsPersistenceModule } from '@/projects/infrastructure/persistence/projects.persistence-module';
+import { ConnectLinearHandler } from './application/commands/connect-linear/connect-linear.handler';
 import { ComputeDeliveryStatsHandler } from './application/queries/compute-delivery-stats/compute-delivery-stats.query';
+import { GetLinearTeamsHandler } from './application/queries/get-linear-teams/get-linear-teams.handler';
 import { LINEAR_API_GATEWAY } from './domain/gateways/linear-api.gateway';
 import { SnapshotLinearProjectService } from './domain/services/snapshot-linear-project/snapshot-linear-project.service';
 import { SnapshotOrganizationLinearService } from './domain/services/snapshot-organization-linear/snapshot-organization-linear.service';
@@ -15,6 +17,8 @@ import { LinearIntegrationPersistenceModule } from './infrastructure/persistence
 @Module({
   imports: [AuthModule, AccountsPersistenceModule, ProjectsPersistenceModule, LinearIntegrationPersistenceModule],
   providers: [
+    ConnectLinearHandler,
+    GetLinearTeamsHandler,
     SnapshotLinearProjectService,
     SnapshotOrganizationLinearService,
     ComputeDeliveryStatsHandler,

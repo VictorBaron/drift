@@ -28,6 +28,7 @@ export interface LinearIssue {
 }
 
 export abstract class LinearApiGateway {
+  abstract exchangeToken(code: string, redirectUri: string): Promise<string>;
   abstract listTeams(token: string): Promise<LinearTeam[]>;
   abstract listProjects(token: string, teamId?: string): Promise<LinearProject[]>;
   abstract getProjectIssues(token: string, projectId: string, since: Date): Promise<LinearIssue[]>;
