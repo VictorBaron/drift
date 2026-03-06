@@ -27,18 +27,3 @@ clawhub install afrexai-react-production
 ## Quick Start
 
 Tell your agent: "Set up a new React project following the React Production Engineering skill"
-
-## ⚡ Level Up
-
-This skill gives you the methodology. For industry-specific patterns:
-
-👉 **[AfrexAI Context Packs](https://afrexai-cto.github.io/context-packs/)** — $47 each, 10 verticals
-
-### 🔗 More Free Skills by AfrexAI
-- [`afrexai-nextjs-production`](https://clawhub.com/skills/afrexai-nextjs-production) — Next.js production engineering
-- [`afrexai-vibe-coding`](https://clawhub.com/skills/afrexai-vibe-coding) — AI-assisted development
-- [`afrexai-test-automation-engineering`](https://clawhub.com/skills/afrexai-test-automation-engineering) — Testing strategy
-- [`afrexai-ui-design-system`](https://clawhub.com/skills/afrexai-ui-design-system) — Design systems
-- [`afrexai-api-architecture`](https://clawhub.com/skills/afrexai-api-architecture) — API design
-
-Built by **AfrexAI** 🖤💛

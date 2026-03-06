@@ -2,6 +2,15 @@
 
 This file provides Claude with context about the Drift React application: its purpose, architecture, conventions, and guidelines for contributing code.
 
+## Mandatory Skill
+
+**When writing any React code in this app, you MUST follow the `afrexai-react-production` skill methodology.**
+Reference: `.claude/skills/afrexai/afrexai-react-production/SKILL.md`
+
+This skill governs: component design, state management, TypeScript patterns, performance optimization, error boundaries, forms, testing, and accessibility. When in doubt, consult it.
+
+For front-end implementation tasks, delegate to the `frontend-architect` agent.
+
 ---
 
 ## Project Overview

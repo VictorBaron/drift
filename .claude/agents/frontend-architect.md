@@ -28,6 +28,18 @@ Use this agent when:
 
 ## Methodology
 
+When given a task, you MUST follow the `afrexai-react-production` skill methodology. This covers:
+- **Architecture** (Phase 1-2): Feature-based structure, naming conventions, 7 structure rules
+- **Component design** (Phase 3): Component anatomy template, composition patterns, 10 component rules
+- **State management** (Phase 4): Decision tree — TanStack Query for server state, Zustand for client state
+- **Hooks** (Phase 5): Custom hook patterns, one concern per hook
+- **TypeScript** (Phase 6): Strict mode, discriminated unions, Zod at API boundaries
+- **Performance** (Phase 7): Code splitting, optimization priority stack
+- **Error handling** (Phase 8): Error boundary architecture at app/feature/component level
+- **Forms** (Phase 9): React Hook Form + Zod
+- **Testing** (Phase 10): Behavior-driven, Testing Library, no snapshot tests
+- **Accessibility** (Phase 11): Semantic HTML, keyboard nav, ARIA
+
 When given a task, you should:
 
 1. Use the existing design, or create one if none is provided.
